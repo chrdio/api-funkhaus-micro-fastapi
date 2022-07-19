@@ -1,0 +1,82 @@
+from ipaddress import IPv4Address
+from uuid import UUID
+from pydantic import BaseModel, PrivateAttr, root_validator
+from typing import List, Optional, Sequence, Tuple
+from datetime import datetime
+from .enums import ChordIntervalStructures, NotesInt, PerformanceFlags, GraphNames
+
+
+class PathData(BaseModel):
+    nodes: List[Tuple[str, str]]
+    graph_name: str
+
+
+class PerformanceData(BaseModel):
+    perf_id: str
+    key: int
+    path_nodes: List[Tuple[str, str]]
+
+
+class SessionData(BaseModel):
+    sess_id: IPv4Address
+    user_id: Optional[UUID] = None
+
+
+class UserData(BaseModel):
+    user_id: UUID
+    sess_id: IPv4Address
+
+
+class LabelData(BaseModel):
+    _localtime: datetime = PrivateAttr(default_factory=datetime.now)
+    sess_id: IPv4Address
+    perf_id: str
+    flag: PerformanceFlags
+    user_id: Optional[UUID] = None
+    _various: Optional[str] = None
+
+    class Config:
+        use_enum_values = True
+        underscore_attrs_are_private = True
+
+
+class PseudoMIDI(BaseModel):
+    voices: Sequence[Sequence[int]]
+    ticket: str
+
+
+class CheetSheet(BaseModel):
+    structures: List[List[int]]
+    special_cases: List[bool]
+    bases: List[int]
+    ordering: str
+    key: int
+
+    @root_validator(pre=True)
+    def check_length(cls, values):
+        equal_length = len(values['structures']) == len(values['special_cases']) == len(values['bases'])
+        if not equal_length:
+            raise ValueError('All lists must be of equal length')
+
+        return values
+
+
+class Node(BaseModel):
+    node_id: str
+    mode: bool
+    tonality: bool
+    gravity: int
+    base: int
+
+
+class Progression(BaseModel):
+    graph: GraphNames
+    orderings: Tuple[str, ...]
+    nodes: Sequence[Node]
+    structures: Sequence[ChordIntervalStructures]
+
+    class Config:
+        use_enum_values = True
+
+    def __hash__(self) -> int:
+        return hash((self.nodes, self.graph, self.structures))

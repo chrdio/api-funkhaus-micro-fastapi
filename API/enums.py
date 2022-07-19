@@ -36,11 +36,11 @@ class ChordIntervalStructures(Enum):
 
 
 class GraphNames(Enum):
-    major_graph = "major_graph"
-    minor_graph = "minor_graph"
+    mixed = "mixed"
     default_graph = "default_graph"
     master_graph = "master_graph"
-    mixed = "mixed"
+    major_graph = "major_graph"
+    minor_graph = "minor_graph"
 
 
 class NotesInt(IntEnum):
