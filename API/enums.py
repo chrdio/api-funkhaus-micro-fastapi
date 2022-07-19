@@ -56,3 +56,20 @@ class NotesInt(IntEnum):
     A = 9
     A_SHARP = 10
     B = 11
+
+
+class NodeIDs(Enum):
+    NORM1_MAJ = "NORM1+"
+    NORM1_MIN = "NORM1-"
+    FLAT2_MAJ = "FLAT2+"
+    SHRP2_MIN = "SHRP2-"
+    FLAT3_MAJ = "FLAT3+"
+    SHRP3_MIN = "SHRP3-"
+    NORM4_MAJ = "NORM4+"
+    NORM4_MIN = "NORM4-"
+    NORM5_MAJ = "NORM5+"
+    NORM5_MIN = "NORM5-"
+    FLAT6_MAJ = "FLAT6+"
+    SHRP6_MIN = "SHRP6-"
+    FLAT7_MAJ = "FLAT7+"
+    SHRP7_MIN = "SHRP7-"
