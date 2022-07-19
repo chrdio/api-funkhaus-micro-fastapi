@@ -1,9 +1,10 @@
 from ipaddress import IPv4Address
 from datetime import datetime
-from typing import Dict, Optional, Sequence, Any, Tuple, Union
+from typing import Optional, Sequence, Any, Tuple
 from uuid import UUID
-from pydantic import BaseModel, root_validator, validator, PrivateAttr, Extra
-from .enums import NotesInt, ChordSymbolStructures, ChordIntervalStructures, GraphNames, NodeIDs, PerformanceFlags
+from pydantic import BaseModel, validator, PrivateAttr, Extra
+
+from .enums import NotesInt, ChordSymbolStructures, GraphNames, NodeIDs, PerformanceFlags
 
 class Performance:
     class Config:
@@ -26,7 +27,7 @@ class GenericRequest(BaseModel):
     user_id: Optional[UUID] = None
     _localtime: datetime = PrivateAttr(default_factory=datetime.now)
 
-        
+
 class LabelingRequest(GenericRequest):
 
     class Config:

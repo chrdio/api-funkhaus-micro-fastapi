@@ -73,3 +73,19 @@ class NodeIDs(Enum):
     SHRP6_MIN = "SHRP6-"
     FLAT7_MAJ = "FLAT7+"
     SHRP7_MIN = "SHRP7-"
+
+class NodeBase(IntEnum):
+    NORM1_MAJ = 0
+    NORM1_MIN = 0
+    FLAT2_MAJ = 1
+    SHRP2_MIN = 2
+    FLAT3_MAJ = 3
+    SHRP3_MIN = 4
+    NORM4_MAJ = 5
+    NORM4_MIN = 5
+    NORM5_MAJ = 7
+    NORM5_MIN = 7
+    FLAT6_MAJ = 8
+    SHRP6_MIN = 9
+    FLAT7_MAJ = 10
+    SHRP7_MIN = 11

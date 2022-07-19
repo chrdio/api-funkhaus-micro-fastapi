@@ -1,4 +1,5 @@
 from ipaddress import IPv4Address
+import random
 from uuid import UUID
 from pydantic import BaseModel, PrivateAttr, root_validator
 from typing import List, Optional, Sequence, Tuple
@@ -19,7 +20,6 @@ class PerformanceData(BaseModel):
 
 class SessionData(BaseModel):
     sess_id: IPv4Address
-    user_id: Optional[UUID] = None
 
 
 class UserData(BaseModel):
@@ -49,8 +49,8 @@ class CheetSheet(BaseModel):
     structures: List[List[int]]
     special_cases: List[bool]
     bases: List[int]
-    ordering: str
-    key: int
+    key: int = random.choice(list(NotesInt))
+    #ordering: str
 
     @root_validator(pre=True)
     def check_length(cls, values):
@@ -80,3 +80,10 @@ class Progression(BaseModel):
 
     def __hash__(self) -> int:
         return hash((self.nodes, self.graph, self.structures))
+
+
+class ProgressionRequest(BaseModel):
+    graph: Optional[str] = None
+
+    class Config:
+        use_enum_values = True
