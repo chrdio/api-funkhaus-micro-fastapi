@@ -6,7 +6,7 @@ from pydantic import BaseModel, validator, PrivateAttr, Extra
 
 from .enums import NotesInt, ChordSymbolStructures, GraphNames, NodeIDs, PerformanceFlags
 
-class Performance:
+class Performance(BaseModel):
     class Config:
         use_enum_values = True
 
