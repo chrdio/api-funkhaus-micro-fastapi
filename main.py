@@ -1,8 +1,16 @@
+import json
 from fastapi import FastAPI
 from aiohttp import ClientSession
 from API import SessionData, Endpoint, post_single_request, post_multi_requests
 from API.inner_models import Progression, ProgressionRequest
 app = FastAPI()
+
+with open("config.json", "r") as config_file:
+    config = json.load(config_file)
+    TITLE = config["title"]
+    PORT = config["port"]
+    HOST = config["host"]
+    RELOAD = config["reload"]
 
 chrdio_api = Endpoint(
     name="random_performance",
@@ -20,3 +28,8 @@ req = ProgressionRequest.parse_obj(req_dict)
 async def test():
     responses = await post_multi_requests(*[(chrdio_api, req) for n in range(1000)])
     return responses
+
+
+if __name__=="__main__":
+    import uvicorn
+    uvicorn.run("main:app", host=HOST, port=PORT, reload=RELOAD)
