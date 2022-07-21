@@ -1,4 +1,5 @@
 import asyncio
+import json
 from typing import Optional, Tuple
 from aiohttp import ClientSession
 from pydantic import BaseModel
@@ -9,7 +10,8 @@ async def post_single_request(endpoint: Endpoint, payload: BaseModel, session: O
         async with ClientSession() as session:
             return await post_single_request(endpoint, payload, session=session)
     else:
-        async with session.post(str(endpoint), json=payload.dict()) as response:
+        serializable = json.loads(payload.json())
+        async with session.post(str(endpoint), json=serializable) as response:
             raw = await response.text()
             if response.status != 200:
                 print(raw)

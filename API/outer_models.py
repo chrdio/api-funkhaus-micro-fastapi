@@ -1,7 +1,7 @@
 import random
 from ipaddress import IPv4Address
 from datetime import datetime
-from typing import Optional, Sequence, Any, Tuple
+from typing import Optional, Sequence, Any, Tuple, Union
 from uuid import UUID
 from pydantic import BaseModel, validator, PrivateAttr, Extra, Field
 
@@ -84,4 +84,4 @@ class PerformanceRequest(GenericRequest):
     class Config:
         use_enum_values = True
 
-    performance_object: Performance = Performance()
+    performance_object: Union[Performance, PerformanceResponse] = Performance()

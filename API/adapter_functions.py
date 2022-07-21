@@ -31,7 +31,7 @@ def construct_path_data(progression: Progression) -> PathData:
     graph = progression.graph
     node_names = [node.node_id for node in progression.nodes]
     structure_names = [
-        ChordSymbolStructures[structure].value # type: ignore Uses enum values
+        ChordSymbolStructures[ChordIntervalStructures(structure).name].value # type: ignore Uses enum values
         for structure in progression.structures
         ] 
     nodes = list(zip(node_names, structure_names))
@@ -42,7 +42,7 @@ def construct_performance_data(progression: Progression, cheet_sheet: CheetSheet
     key = cheet_sheet.key
     node_names = [node.node_id for node in progression.nodes]
     structure_names = [
-        ChordSymbolStructures[structure].value # type: ignore Uses enum values
+        ChordSymbolStructures[ChordIntervalStructures(structure).name].value # type: ignore Uses enum values
         for structure in progression.structures
         ] 
     path_nodes = list(zip(node_names, structure_names))

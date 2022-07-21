@@ -1,4 +1,4 @@
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Union
 from pydantic import BaseModel
 from .adapter_functions import (
     construct_progression_request,
@@ -43,3 +43,15 @@ def get_req_midihex_generation(pseudo: PseudoMIDI) -> Tuple[Endpoint, PseudoMIDI
     endpoint = ENDPOINTS["microbureaucrat/savemidi"]
     endpoint.option = 'mid'
     return (endpoint, pseudo)
+
+def get_req_ensure_session(user_session: Union[UserData, SessionData]) -> Tuple[Endpoint, Union[UserData, SessionData]]:
+    endpoint = ENDPOINTS["microaccountant/people"]
+    return (endpoint, user_session)
+
+def get_req_ensure_music(music: Union[PerformanceData, PathData]) -> Tuple[Endpoint, Union[PerformanceData, PathData]]:
+    endpoint = ENDPOINTS["microaccountant/music"]
+    return (endpoint, music)
+
+def get_req_ensure_label(label: LabelData) -> Tuple[Endpoint, LabelData]:
+    endpoint = ENDPOINTS["microaccountant/data"]
+    return (endpoint, label)

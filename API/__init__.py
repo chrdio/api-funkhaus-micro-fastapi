@@ -24,6 +24,8 @@ from .outer_models import (
     Performance,
     GenericRequest,
     LabelingRequest,
+    PerformanceResponse,
+    PerformanceRequest
 )
 from .engine import (
     post_multi_requests,
@@ -37,4 +39,7 @@ from .requests import (
     get_req_progression_generation,
     get_req_voices_generation,
     get_req_midihex_generation,
+    get_req_ensure_session,
+    get_req_ensure_music,
+    get_req_ensure_label,
 )

@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from aiohttp import ClientSession
 from API.outer_models import PerformanceResponse
 from actions import generate_progression
-from API import Performance
+from API import PerformanceRequest
 app = FastAPI(
     title="microfunkhaus",
     docs_url='/'
@@ -19,7 +19,7 @@ with open("config.json", "r") as config_file:
 
 
 @app.post("/progression")
-async def gen_progression(performance: Union[PerformanceResponse, Performance]):
+async def gen_progression(performance: PerformanceRequest):
     responses = await generate_progression(performance)
     return responses
 
