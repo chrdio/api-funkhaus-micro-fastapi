@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Optional, Tuple
 from pydantic import BaseModel
 from .adapter_functions import (
     get_path_data,
@@ -37,3 +37,8 @@ def get_req_progression_amendment(performance: Performance, index: int) -> Tuple
     endpoint = ENDPOINTS["micropathforger/amend"]
     endpoint.option = str(index)
     return (endpoint, get_progression_request(performance))
+
+def get_req_voices_generation(performance: Performance, progression: Optional[Progression] = None) -> Tuple[Endpoint, CheetSheet]:
+    cheetsheet = get_cheet_sheet(performance, progression=progression)
+    endpoint = ENDPOINTS["microvoicemaster/perform"]
+    return (endpoint, cheetsheet)

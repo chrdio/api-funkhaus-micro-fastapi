@@ -1,7 +1,7 @@
 from ipaddress import IPv4Address
 import random
 from uuid import UUID
-from pydantic import BaseModel, PrivateAttr, root_validator
+from pydantic import BaseModel, PrivateAttr, root_validator, Field, validator
 from typing import List, Optional, Sequence, Tuple
 from datetime import datetime
 from .enums import ChordIntervalStructures, NotesInt, PerformanceFlags, GraphNames
@@ -49,8 +49,8 @@ class CheetSheet(BaseModel):
     structures: List[List[int]]
     special_cases: List[bool]
     bases: List[int]
-    key: int = random.choice(list(NotesInt))
-    #ordering: str
+    key: int
+    #ordering: str (is randomized on site)
 
     @root_validator(pre=True)
     def check_length(cls, values):
@@ -60,6 +60,10 @@ class CheetSheet(BaseModel):
 
         return values
 
+    @validator('key', pre=True)
+    def key_valid(cls, v):
+        if v is None:
+            return random.choice(range(12))
 
 class Node(BaseModel):
     node_id: str

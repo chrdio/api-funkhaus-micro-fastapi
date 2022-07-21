@@ -1,8 +1,9 @@
+import random
 from ipaddress import IPv4Address
 from datetime import datetime
 from typing import Optional, Sequence, Any, Tuple
 from uuid import UUID
-from pydantic import BaseModel, validator, PrivateAttr, Extra
+from pydantic import BaseModel, validator, PrivateAttr, Extra, Field
 
 from .enums import NotesInt, ChordSymbolStructures, GraphNames, NodeIDs, PerformanceFlags
 
@@ -15,6 +16,7 @@ class Performance(BaseModel):
     ticket: Optional[str] = None
     nodes: Sequence[Tuple[NodeIDs, ChordSymbolStructures]] = list()
     human_readable: Optional[Sequence[Any]] = None
+
 
 
 

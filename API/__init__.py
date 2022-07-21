@@ -33,4 +33,5 @@ from .endpoints import (
 )
 from .requests import (
     get_req_progression_generation,
+    get_req_voices_generation,
 )
