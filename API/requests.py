@@ -42,3 +42,8 @@ def get_req_voices_generation(performance: Performance, progression: Optional[Pr
     cheetsheet = get_cheet_sheet(performance, progression=progression)
     endpoint = ENDPOINTS["microvoicemaster/perform"]
     return (endpoint, cheetsheet)
+
+def get_req_midihex_generation(pseudo: PseudoMIDI) -> Tuple[Endpoint, PseudoMIDI]:
+    endpoint = ENDPOINTS["microbureaucrat/savemidi"]
+    endpoint.option = 'mid'
+    return (endpoint, pseudo)
