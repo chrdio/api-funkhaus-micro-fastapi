@@ -1,14 +1,17 @@
 import json
 from typing import Dict, Sequence
 from API import (
+    get_req_ensure_label,
+    get_req_ensure_music,
+    get_req_ensure_session,
     get_req_progression_generation,
     get_req_voices_generation,
     get_req_midihex_generation,
-    get_req_ensure_music,
     PseudoMIDI,
     Progression,
     Performance,
     PerformanceRequest,
+    LabelingRequest,
     PerformanceResponse,
     construct_performance,
     construct_progression,
@@ -20,9 +23,6 @@ from API import (
     post_multi_requests,
     post_single_request,
 )
-from API.outer_models import LabelingRequest, PerformanceRequest, PerformanceResponse
-from API.requests import get_req_ensure_session
-
 
 async def generate_progression(full_request: PerformanceRequest) -> PerformanceResponse:
     performance = full_request.performance_object
@@ -72,3 +72,23 @@ async def generate_progression(full_request: PerformanceRequest) -> PerformanceR
     await ensured_perf
 
     return outcoming_performance
+
+async def send_labels(labeling_request: LabelingRequest) -> bool:
+    """Send labels to the server."""
+
+    if labeling_request.user_id is not None:
+        session_data = construct_user_data(labeling_request)
+    else:
+        session_data = construct_session_data(labeling_request)
+    req_ensure_session = get_req_ensure_session(session_data)
+    ensured_session = post_single_request(*req_ensure_session)
+
+    label_data = construct_label_data(labeling_request)
+    req_label = get_req_ensure_label(label_data)
+    try:
+
+        await post_single_request(*req_label)
+        await ensured_session
+        return True
+    except ValueError:
+        return False

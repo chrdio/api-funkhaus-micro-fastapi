@@ -13,8 +13,9 @@ async def post_single_request(endpoint: Endpoint, payload: BaseModel, session: O
         serializable = json.loads(payload.json())
         async with session.post(str(endpoint), json=serializable) as response:
             raw = await response.text()
-            if response.status != 200:
+            if response.status > 300:
                 print(raw)
+                raise ValueError(f'Request failed with status {response.status}')
             return raw
 
 async def post_multi_requests(*items: Tuple[Endpoint, BaseModel]):
