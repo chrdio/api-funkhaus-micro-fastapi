@@ -29,4 +29,5 @@ from .engine import (
 )
 from .endpoints import (
     Endpoint,
+    ENDPOINTS
 )
