@@ -1,9 +1,12 @@
 import json
 from fastapi import FastAPI
 from aiohttp import ClientSession
-from API import SessionData, Endpoint, post_single_request, post_multi_requests
-from API.inner_models import Progression, ProgressionRequest
-app = FastAPI()
+from actions import generate_progression
+from API import Performance
+app = FastAPI(
+    title="microfunkhaus",
+    docs_url='/'
+    )
 
 with open("config.json", "r") as config_file:
     config = json.load(config_file)
@@ -12,21 +15,10 @@ with open("config.json", "r") as config_file:
     HOST = config["host"]
     RELOAD = config["reload"]
 
-chrdio_api = Endpoint(
-    name="random_performance",
-    host="127.0.0.1",
-    port="8001",
-    path="generate/4",
-)
-req_dict = {
-    "graph": "master_graph"
-}
 
-
-req = ProgressionRequest.parse_obj(req_dict)
-@app.get("/")
-async def test():
-    responses = await post_multi_requests(*[(chrdio_api, req) for n in range(1000)])
+@app.post("/progression")
+async def gen_progression(performance: Performance):
+    responses = await generate_progression(performance)
     return responses
 
 

@@ -31,3 +31,6 @@ from .endpoints import (
     Endpoint,
     ENDPOINTS
 )
+from .requests import (
+    get_req_progression_generation,
+)
