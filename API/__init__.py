@@ -1,12 +1,12 @@
 from .adapter_functions import (
-    get_path_data,
-    get_performance_data,
-    get_session_data,
-    get_user_data,
-    get_label_data,
-    get_progression_request,
-    get_cheet_sheet,
-    get_performance
+    construct_path_data,
+    construct_performance_data,
+    construct_session_data,
+    construct_user_data,
+    construct_label_data,
+    construct_progression_request,
+    construct_cheet_sheet,
+    construct_performance
 )
 from .inner_models import (
     PathData,
