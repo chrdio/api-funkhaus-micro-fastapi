@@ -6,6 +6,7 @@ from API import (
     get_req_midihex_generation,
     post_multi_requests,
     construct_performance,
+    construct_progression,
     post_single_request,
     Performance,
     Progression,
@@ -15,9 +16,13 @@ from API.outer_models import PerformanceResponse
 
 
 async def generate_progression(performance: Performance) -> PerformanceResponse:
-    req_prog = get_req_progression_generation(performance)
-    progression_raw = await post_single_request(*req_prog) # type: str
-    progression = Progression.parse_raw(progression_raw)
+    if isinstance(performance, PerformanceResponse):
+        progression = construct_progression(performance)
+    else:
+        req_prog = get_req_progression_generation(performance)
+        progression_raw = await post_single_request(*req_prog) # type: str
+        progression = Progression.parse_raw(progression_raw)
+        
 
     req_voice = get_req_voices_generation(performance, progression=progression)
     voices_raw = await post_single_request(*req_voice) # type: str

@@ -6,7 +6,8 @@ from .adapter_functions import (
     construct_label_data,
     construct_progression_request,
     construct_cheet_sheet,
-    construct_performance
+    construct_performance,
+    construct_progression
 )
 from .inner_models import (
     PathData,

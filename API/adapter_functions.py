@@ -73,8 +73,8 @@ def construct_cheet_sheet(performance: Performance, progression: Optional[Progre
         else:
             raise ValueError('Not enough data to generate a CheetSheet.')
     else:
-        bases = [NodeBase[NodeIDs(node[0])].value for node in performance.nodes]   # type: ignore Uses enum values
-        structures = [ChordIntervalStructures[node[1]].value for node in performance.nodes] # type: ignore Uses enum values
+        bases = [node.base for node in performance.nodes]   # type: ignore Uses enum values
+        structures = [ChordIntervalStructures[struc].value for struc in performance.structures] # type: ignore Uses enum values
     
     key = performance.key
     special_cases = [14 in struc for struc in structures]   # type: ignore Uses enum values
@@ -86,7 +86,7 @@ def construct_progression(performance: PerformanceResponse) -> Progression:
         for node in performance.nodes
         ]
     structures = [
-        ChordIntervalStructures(ChordSymbolStructures(struc).name)
+        ChordIntervalStructures[ChordSymbolStructures(struc).name]
         for struc in performance.structures
         ]
     return Progression(graph=performance.graph, nodes=nodes, structures=structures)

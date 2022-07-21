@@ -12,7 +12,6 @@ from .enums import NotesInt, ChordSymbolStructures, GraphNames, NodeIDs, Perform
 class Performance(BaseModel):
     class Config:
         use_enum_values = True
-        allow_extra = Extra.allow
 
     key: Optional[NotesInt] = None
     graph: Optional[GraphNames] = None

@@ -1,6 +1,8 @@
 import json
+from typing import Union
 from fastapi import FastAPI
 from aiohttp import ClientSession
+from API.outer_models import PerformanceResponse
 from actions import generate_progression
 from API import Performance
 app = FastAPI(
@@ -17,7 +19,7 @@ with open("config.json", "r") as config_file:
 
 
 @app.post("/progression")
-async def gen_progression(performance: Performance):
+async def gen_progression(performance: Union[PerformanceResponse, Performance]):
     responses = await generate_progression(performance)
     return responses
 
