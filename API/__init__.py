@@ -6,6 +6,7 @@ from .adapter_functions import (
     get_label_data,
     get_progression_request,
     get_cheet_sheet,
+    get_performance
 )
 from .inner_models import (
     PathData,

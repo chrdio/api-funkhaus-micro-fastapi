@@ -1,23 +1,38 @@
 import json
-from typing import Sequence
+from typing import Dict, Sequence
 from API import (
     get_req_progression_generation,
     get_req_voices_generation,
     get_req_midihex_generation,
+    get_performance,
     post_multi_requests,
     post_single_request,
     Performance,
     Progression,
     PseudoMIDI
 )
+from API.outer_models import PerformanceResponse
 
 
-async def generate_progression(performance: Performance):
-    progression_raw = await post_single_request(*get_req_progression_generation(performance)) # type: str
+async def generate_progression(performance: Performance) -> PerformanceResponse:
+    req_prog = get_req_progression_generation(performance)
+    progression_raw = await post_single_request(*req_prog) # type: str
     progression = Progression.parse_raw(progression_raw)
-    voices_raw = await post_single_request(*get_req_voices_generation(performance, progression=progression)) # type: str
+
+    req_voice = get_req_voices_generation(performance, progression=progression)
+    voices_raw = await post_single_request(*req_voice) # type: str
     voices = PseudoMIDI.parse_raw(voices_raw)
-    midihex_raw = await post_single_request(*get_req_midihex_generation(voices)) # type: str
+
+    req_midihex = get_req_midihex_generation(voices)
+    midihex_raw = await post_single_request(*req_midihex) # type: str
     midihex = json.loads(midihex_raw)
-    return midihex
+
+    cheetsheet = req_voice[1]
+    outcoming_performance = get_performance(
+        progression,
+        cheetsheet,
+        midihex
+    )
+
+    return outcoming_performance
 

@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Dict, Optional
 from .inner_models import (
     PathData,
     PerformanceData,
@@ -22,7 +22,8 @@ from .enums import (
 from .outer_models import (
     Performance,
     GenericRequest,
-    LabelingRequest
+    LabelingRequest,
+    PerformanceResponse
 )
 
 
@@ -64,7 +65,7 @@ def get_label_data(request: LabelingRequest) -> LabelData:
 def get_progression_request(performance: Performance) -> ProgressionRequest:
     return ProgressionRequest(graph=performance.graph)  # type: ignore Uses enum values
 
-def get_cheet_sheet(performance: Performance, progression: Optional[Progression] = None) -> CheetSheet:
+def get_cheet_sheet(performance: PerformanceResponse, progression: Optional[Progression] = None) -> CheetSheet:
     if progression:
         structures = progression.structures
         bases = [node.base for node in progression.nodes]
@@ -79,3 +80,16 @@ def get_cheet_sheet(performance: Performance, progression: Optional[Progression]
     chsh = CheetSheet(structures=structures, special_cases=special_cases, bases=bases, key=key)     # type: ignore Uses enum values
     return chsh
 
+def get_performance(progression: Progression, cheetsheet: CheetSheet, hex_blob: str) -> PerformanceResponse:
+    node_names = [NodeIDs(node.node_id) for node in progression.nodes]
+    structure_names = [ChordSymbolStructures(ChordIntervalStructures(structure).name) for structure in progression.structures] # type: ignore Uses enum values
+    nodes = list(zip(node_names, structure_names))
+    performance = PerformanceResponse(
+        graph=progression.graph,
+        key=NotesInt(cheetsheet.key),
+        nodes=nodes,
+        hex_blob=hex_blob,
+        human_readable=list(list())
+        )
+    
+    return performance

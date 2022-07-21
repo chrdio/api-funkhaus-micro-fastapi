@@ -10,12 +10,21 @@ from .enums import NotesInt, ChordSymbolStructures, GraphNames, NodeIDs, Perform
 class Performance(BaseModel):
     class Config:
         use_enum_values = True
+        allow_extra = Extra.allow
 
     key: Optional[NotesInt] = None
     graph: Optional[GraphNames] = None
-    ticket: Optional[str] = None
-    nodes: Sequence[Tuple[NodeIDs, ChordSymbolStructures]] = list()
-    human_readable: Optional[Sequence[Any]] = None
+    
+    
+class PerformanceResponse(Performance):
+    class Config:
+        use_enum_values = True
+    
+    key: NotesInt
+    graph: GraphNames
+    nodes: Sequence[Tuple[NodeIDs, ChordSymbolStructures]]
+    hex_blob: str
+    human_readable: Sequence[Any]
 
 
 

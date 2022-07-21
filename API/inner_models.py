@@ -49,21 +49,18 @@ class CheetSheet(BaseModel):
     structures: List[List[int]]
     special_cases: List[bool]
     bases: List[int]
-    key: int
+    key: Optional[int] = Field(default_factory=lambda: random.randint(0, 11))
     #ordering: str (is randomized on site)
 
     @root_validator(pre=True)
     def check_length(cls, values):
+        if values.get('key') is None:
+            values['key'] = random.randint(0, 11)
         equal_length = len(values['structures']) == len(values['special_cases']) == len(values['bases'])
         if not equal_length:
             raise ValueError('All lists must be of equal length')
 
         return values
-
-    @validator('key', pre=True)
-    def key_valid(cls, v):
-        if v is None:
-            return random.choice(range(12))
 
 class Node(BaseModel):
     node_id: str
@@ -75,9 +72,9 @@ class Node(BaseModel):
 
 class Progression(BaseModel):
     graph: GraphNames
-    orderings: Tuple[str, ...]
     nodes: Sequence[Node]
     structures: Sequence[ChordIntervalStructures]
+    orderings: Optional[Tuple[str, ...]] = None
 
     class Config:
         use_enum_values = True
