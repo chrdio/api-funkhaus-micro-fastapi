@@ -91,15 +91,16 @@ def construct_progression(performance: PerformanceResponse) -> Progression:
         ]
     return Progression(graph=performance.graph, nodes=nodes, structures=structures)
 
-def construct_performance(progression: Progression, cheetsheet: CheetSheet, hex_blob: str) -> PerformanceResponse:
+def construct_performance(*, progression: Progression, cheet_sheet: CheetSheet, pseudo_midi: PseudoMIDI, hex_blob: str) -> PerformanceResponse:
     structure_names = [ChordSymbolStructures(ChordIntervalStructures(structure).name) for structure in progression.structures] # type: ignore Uses enum values
     performance = PerformanceResponse(
         graph=progression.graph,
-        key=NotesInt(cheetsheet.key),
+        key=NotesInt(cheet_sheet.key),
         nodes=progression.nodes,
         hex_blob=hex_blob,
         human_readable=list(list()),
         structures=structure_names,
+        ticket=pseudo_midi.ticket
         )
     
     return performance

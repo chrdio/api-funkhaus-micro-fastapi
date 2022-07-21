@@ -20,7 +20,7 @@ from API import (
     post_multi_requests,
     post_single_request,
 )
-from API.outer_models import PerformanceRequest, PerformanceResponse
+from API.outer_models import LabelingRequest, PerformanceRequest, PerformanceResponse
 from API.requests import get_req_ensure_session
 
 
@@ -61,9 +61,10 @@ async def generate_progression(full_request: PerformanceRequest) -> PerformanceR
     midihex = json.loads(midihex_raw)
 
     outcoming_performance = construct_performance(
-        progression,
-        cheetsheet,
-        midihex
+        progression=progression,
+        cheet_sheet=cheetsheet,
+        hex_blob=midihex,
+        pseudo_midi=voices
     )
 
     await ensured_session
@@ -71,4 +72,3 @@ async def generate_progression(full_request: PerformanceRequest) -> PerformanceR
     await ensured_perf
 
     return outcoming_performance
-

@@ -25,6 +25,7 @@ class PerformanceResponse(Performance):
     graph: GraphNames
     nodes: Sequence[Node]
     structures: Sequence[ChordSymbolStructures]
+    ticket: str
     hex_blob: str
     human_readable: Sequence[Any]
 
