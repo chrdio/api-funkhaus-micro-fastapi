@@ -5,6 +5,8 @@ from typing import Optional, Sequence, Any, Tuple
 from uuid import UUID
 from pydantic import BaseModel, validator, PrivateAttr, Extra, Field
 
+from API.inner_models import Node
+
 from .enums import NotesInt, ChordSymbolStructures, GraphNames, NodeIDs, PerformanceFlags
 
 class Performance(BaseModel):
@@ -22,9 +24,29 @@ class PerformanceResponse(Performance):
     
     key: NotesInt
     graph: GraphNames
-    nodes: Sequence[Tuple[NodeIDs, ChordSymbolStructures]]
+    nodes: Sequence[Node]
+    structures: Sequence[ChordSymbolStructures]
     hex_blob: str
     human_readable: Sequence[Any]
+
+    @classmethod
+    def from_performance(cls, performance: Performance):
+        perf_dict = performance.dict()
+        has_all_values = all(
+            perf_dict.get(key)
+            for key in [
+                'key',
+                'graph',
+                'nodes',
+                'structures',
+                'hex_blob',
+                'human_readable'
+                ]
+        )
+        if has_all_values:
+            return cls(**perf_dict)
+        else:
+            raise ValueError('Performance is missing required values to create a PerformanceResponse')
 
 
 

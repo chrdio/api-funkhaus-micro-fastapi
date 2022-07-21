@@ -34,7 +34,7 @@ def get_req_progression_amendment(performance: Performance, index: int) -> Tuple
     endpoint.option = str(index)
     return (endpoint, construct_progression_request(performance))
 
-def get_req_voices_generation(performance: PerformanceResponse, progression: Optional[Progression] = None) -> Tuple[Endpoint, CheetSheet]:
+def get_req_voices_generation(performance: Performance, progression: Optional[Progression] = None) -> Tuple[Endpoint, CheetSheet]:
     cheetsheet = construct_cheet_sheet(performance, progression=progression)
     endpoint = ENDPOINTS["microvoicemaster/perform"]
     return (endpoint, cheetsheet)

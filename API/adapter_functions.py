@@ -82,25 +82,24 @@ def construct_cheet_sheet(performance: Performance, progression: Optional[Progre
 
 def construct_progression(performance: PerformanceResponse) -> Progression:
     nodes = [
-        node[0]
+        node
         for node in performance.nodes
         ]
     structures = [
-        ChordIntervalStructures(ChordSymbolStructures(node[1]).name)
-        for node in performance.nodes
+        ChordIntervalStructures(ChordSymbolStructures(struc).name)
+        for struc in performance.structures
         ]
     return Progression(graph=performance.graph, nodes=nodes, structures=structures)
 
 def construct_performance(progression: Progression, cheetsheet: CheetSheet, hex_blob: str) -> PerformanceResponse:
-    node_names = [NodeIDs(node.node_id) for node in progression.nodes]
     structure_names = [ChordSymbolStructures(ChordIntervalStructures(structure).name) for structure in progression.structures] # type: ignore Uses enum values
-    nodes = list(zip(node_names, structure_names))
     performance = PerformanceResponse(
         graph=progression.graph,
         key=NotesInt(cheetsheet.key),
-        nodes=nodes,
+        nodes=progression.nodes,
         hex_blob=hex_blob,
-        human_readable=list(list())
+        human_readable=list(list()),
+        structures=structure_names,
         )
     
     return performance

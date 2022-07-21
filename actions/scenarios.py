@@ -4,8 +4,8 @@ from API import (
     get_req_progression_generation,
     get_req_voices_generation,
     get_req_midihex_generation,
-    get_performance,
     post_multi_requests,
+    construct_performance,
     post_single_request,
     Performance,
     Progression,
@@ -28,7 +28,7 @@ async def generate_progression(performance: Performance) -> PerformanceResponse:
     midihex = json.loads(midihex_raw)
 
     cheetsheet = req_voice[1]
-    outcoming_performance = get_performance(
+    outcoming_performance = construct_performance(
         progression,
         cheetsheet,
         midihex
