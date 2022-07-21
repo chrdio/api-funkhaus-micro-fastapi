@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from .adapter_functions import (
     construct_progression_request,
     construct_cheet_sheet,
+    construct_progression,
 )
 from .inner_models import (
     PathData,
@@ -29,10 +30,10 @@ from .endpoints import (
 def get_req_progression_generation(performance: Performance) -> Tuple[Endpoint, ProgressionRequest]:
     return (ENDPOINTS["micropathforger/generate"], construct_progression_request(performance))
 
-def get_req_progression_amendment(performance: Performance, index: int) -> Tuple[Endpoint, ProgressionRequest]:
+def get_req_progression_amendment(performance: PerformanceResponse, index: int) -> Tuple[Endpoint, Progression]:
     endpoint = ENDPOINTS["micropathforger/amend"]
     endpoint.option = str(index)
-    return (endpoint, construct_progression_request(performance))
+    return (endpoint, construct_progression(performance))
 
 def get_req_voices_generation(performance: Performance, progression: Optional[Progression] = None) -> Tuple[Endpoint, CheetSheet]:
     cheetsheet = construct_cheet_sheet(performance, progression=progression)

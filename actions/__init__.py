@@ -1,1 +1,1 @@
-from .scenarios import generate_progression, send_labels
+from .scenarios import generate_progression, send_labels, amend_progression

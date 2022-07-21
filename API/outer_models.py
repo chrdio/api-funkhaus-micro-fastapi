@@ -86,3 +86,10 @@ class PerformanceRequest(GenericRequest):
         use_enum_values = True
 
     performance_object: Union[Performance, PerformanceResponse] = Performance()
+
+class AmendmentRequest(PerformanceRequest):
+
+    class Config:
+        use_enum_values = True
+
+    performance_object:  PerformanceResponse

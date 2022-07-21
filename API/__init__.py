@@ -25,7 +25,8 @@ from .outer_models import (
     GenericRequest,
     LabelingRequest,
     PerformanceResponse,
-    PerformanceRequest
+    PerformanceRequest,
+    AmendmentRequest,
 )
 from .engine import (
     post_multi_requests,

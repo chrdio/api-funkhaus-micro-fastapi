@@ -1,7 +1,8 @@
 import json
 from fastapi import FastAPI, Response, HTTPException
 from API import PerformanceRequest, LabelingRequest
-from actions import generate_progression, send_labels
+from API.outer_models import AmendmentRequest
+from actions import generate_progression, send_labels, amend_progression
 app = FastAPI(
     title="microfunkhaus",
     docs_url='/'
@@ -18,6 +19,11 @@ with open("config.json", "r") as config_file:
 @app.post("/harmony/generate")
 async def gen_progression(performance: PerformanceRequest):
     responses = await generate_progression(performance)
+    return responses
+
+@app.post("/harmony/amend/{index}")
+async def amend_performance(full_request: AmendmentRequest, index: int):
+    responses = await amend_progression(full_request, index)
     return responses
 
 

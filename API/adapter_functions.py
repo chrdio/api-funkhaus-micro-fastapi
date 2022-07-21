@@ -66,15 +66,15 @@ def construct_progression_request(performance: Performance) -> ProgressionReques
     return ProgressionRequest(graph=performance.graph)  # type: ignore Uses enum values
 
 def construct_cheet_sheet(performance: Performance, progression: Optional[Progression] = None) -> CheetSheet:
-    if performance.__class__ is not PerformanceResponse:
-        if progression:
-            structures = progression.structures
-            bases = [node.base for node in progression.nodes]
-        else:
-            raise ValueError('Not enough data to generate a CheetSheet.')
+    if progression:
+        structures = progression.structures
+        bases = [node.base for node in progression.nodes]
     else:
-        bases = [node.base for node in performance.nodes]   # type: ignore Uses enum values
-        structures = [ChordIntervalStructures[struc].value for struc in performance.structures] # type: ignore Uses enum values
+        try:
+            bases = [node.base for node in performance.nodes]   # type: ignore Uses enum values
+            structures = [ChordIntervalStructures[struc].value for struc in performance.structures] # type: ignore Uses enum values
+        except AttributeError:
+            raise ValueError('Not enough data to generate a CheetSheet.')
     
     key = performance.key
     special_cases = [14 in struc for struc in structures]   # type: ignore Uses enum values
