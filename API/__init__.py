@@ -42,6 +42,7 @@ from .requests import (
     get_req_progression_generation,
     get_req_voices_generation,
     get_req_midihex_generation,
+    get_req_user_creation,
     ENSUREMENT_REQUEST_METHODS,
     submit_data_tasks,
 )

@@ -60,6 +60,10 @@ def get_req_ensure_label(label: LabelData) -> Tuple[Endpoint, LabelData]:
     endpoint = ENDPOINTS["microaccountant/data"]
     return (endpoint, label)
 
+def get_req_user_creation(request: SessionData) -> Tuple[Endpoint, SessionData]:
+    endpoint = ENDPOINTS["microaccountant/createuser"]
+    return (endpoint, request)
+
 ENSUREMENT_REQUEST_METHODS = {
     PerformanceData: get_req_ensure_music,
     PathData: get_req_ensure_music,

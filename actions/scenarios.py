@@ -5,6 +5,7 @@ from API import (
     get_req_progression_generation,
     get_req_progression_amendment,
     get_req_voices_generation,
+    get_req_user_creation,
     submit_data_tasks,
     PseudoMIDI,
     Progression,
@@ -23,6 +24,7 @@ from API import (
     post_single_request,
     get_req_midihex_generation,
 )
+from API.outer_models import GenericRequest
 from logsetup import get_logger
 
 logger_generator = get_logger("generate_performance")
@@ -143,3 +145,14 @@ async def send_labels(labeling_request: LabelingRequest) -> bool:
     del task_chest
     await local_session.close()
     return True
+
+async def create_user(userinit_request: GenericRequest) -> GenericRequest:
+    local_session = ClientSession()
+
+    session_data = construct_session_data(userinit_request)
+    user_request = get_req_user_creation(session_data)
+    user_raw = await post_single_request(*user_request, session=local_session)
+    user_obj = GenericRequest.parse_raw(user_raw) # type: ignore
+    
+    await local_session.close()
+    return user_obj

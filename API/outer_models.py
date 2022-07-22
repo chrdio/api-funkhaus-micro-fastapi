@@ -93,7 +93,7 @@ class GenericRequest(BaseModel):
         extra = Extra.ignore
         underscore_attrs_are_private = True
 
-    session_id: IPv4Address
+    sess_id: IPv4Address
     user_id: Optional[UUID] = None
     _localtime: datetime = PrivateAttr(default_factory=datetime.now)
 

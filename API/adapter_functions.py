@@ -51,16 +51,16 @@ def construct_voicing_data(progression: Progression, cheet_sheet: CheetSheet, ps
 
 
 def construct_session_data(request: GenericRequest) -> SessionData:
-    return SessionData(sess_id=request.session_id)
+    return SessionData(sess_id=request.sess_id)
 
 def construct_user_data(request: GenericRequest) -> UserData:
     if request.user_id:
-        return UserData(user_id=request.user_id, sess_id=request.session_id)
+        return UserData(user_id=request.user_id, sess_id=request.sess_id)
     else:
         raise ValueError('No user ID provided')
 
 def construct_label_data(request: LabelingRequest) -> LabelData:
-    return LabelData(sess_id=request.session_id, perf_id=request.ticket, flag=request.flag, user_id=request.user_id)
+    return LabelData(sess_id=request.sess_id, perf_id=request.ticket, flag=request.flag, user_id=request.user_id)
 
 def construct_progression_request(performance: Union[Performance, PerformanceResponse]) -> ProgressionRequest:
     return ProgressionRequest(graph=performance.graph)  # type: ignore Uses enum values
