@@ -31,6 +31,7 @@ from .outer_models import (
 from .engine import (
     post_multi_requests,
     post_single_request,
+    instant_fire_coroutines,
 )
 from .endpoints import (
     Endpoint,

@@ -25,3 +25,11 @@ async def post_multi_requests(*items: Tuple[Endpoint, BaseModel]):
             *[post_single_request(endpoint, payload, session=session) for endpoint, payload in items]
         )
         return await results # type: List[str]
+
+async def instant_fire_coroutines(*coroutines, storage: set) -> Tuple[asyncio.Task]:
+    
+    def store_task(task: asyncio.Task, storage: set):
+        storage.add(task)
+        return task
+
+    return tuple(store_task(asyncio.create_task(coro), storage) for coro in coroutines)
