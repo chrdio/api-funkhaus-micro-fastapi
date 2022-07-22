@@ -2,6 +2,7 @@ import json
 from fastapi import FastAPI, Response, HTTPException
 from API import PerformanceRequest, LabelingRequest
 from API.outer_models import AmendmentRequest, GenericRequest
+from aiohttp import ClientResponseError
 from actions import generate_progression, send_labels, amend_progression, create_user
 app = FastAPI(
     title="microfunkhaus",
@@ -18,28 +19,36 @@ with open("config.json", "r") as config_file:
 
 @app.post("/generate")
 async def gen_progression(performance: PerformanceRequest):
-    responses = await generate_progression(performance)
+    try:
+        responses = await generate_progression(performance)
+    except ClientResponseError as e:
+        raise HTTPException(status_code=e.status, detail=e.message)
     return responses
 
 @app.post("/amend/{index}")
 async def amend_performance(full_request: AmendmentRequest, index: int):
-    responses = await amend_progression(full_request, index)
+    try:
+        responses = await amend_progression(full_request, index)
+    except ClientResponseError as e:
+        raise HTTPException(status_code=e.status, detail=e.message)
     return responses
 
 
 @app.post("/label")
 async def label_progression(labeling_request: LabelingRequest):
-    labels_sent = await send_labels(labeling_request)
-    if labels_sent:
-        return Response(status_code=201)
-    else:
-        raise HTTPException(status_code=400, detail="Labeling failed")
+    try:
+        responses = await send_labels(labeling_request)
+    except ClientResponseError as e:
+        raise HTTPException(status_code=e.status, detail=e.message)
+    return Response(status_code=201)
 
 @app.post("/create_user_id")
 async def initialize_user(request: GenericRequest):
-    user_obj = await create_user(request)
-    user_obj = user_obj.json()
-    return Response(content=user_obj, status_code=201, media_type="application/json")
+    try:
+        user_obj = await create_user(request)
+    except ClientResponseError as e:
+        raise HTTPException(status_code=e.status, detail=e.message)
+    return Response(content=user_obj.json(), status_code=201, media_type="application/json")
 
 
 if __name__=="__main__":

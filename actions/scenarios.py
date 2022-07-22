@@ -1,6 +1,6 @@
 import json
 import asyncio
-from aiohttp import ClientSession
+from aiohttp import ClientSession, ClientResponseError
 from API import (
     get_req_progression_generation,
     get_req_progression_amendment,
@@ -79,7 +79,11 @@ async def generate_progression(full_request: PerformanceRequest) -> PerformanceR
     )
     logger_generator.info(f"Constructed a new performance.")
 
-    await asyncio.gather(*task_chest)
+    try:
+        await asyncio.gather(*task_chest)
+    except ClientResponseError as e:
+        logger_generator.warning(f"Request failed: {e.status} {e.message}")
+        raise
     del task_chest
     await local_session.close()
     logger_generator.info(f"Received all responses from the server.")
