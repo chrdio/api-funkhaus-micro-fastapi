@@ -3,11 +3,26 @@ from ipaddress import IPv4Address
 from datetime import datetime
 from typing import Optional, Sequence, Any, Tuple, Union
 from uuid import UUID
-from pydantic import BaseModel, validator, PrivateAttr, Extra, Field
+from pydantic import(
+    BaseModel,
+    root_validator,
+    PrivateAttr,
+    Extra,
+    Field,
+)
 
 from API.inner_models import Node
 
-from .enums import NotesInt, ChordSymbolStructures, GraphNames, NodeIDs, PerformanceFlags
+from .enums import (
+    NotesInt,
+    NotesSymbol,
+    ChordSymbolStructures,
+    GraphNames,
+    PerformanceFlags,
+    ChordTypes,
+    StructureSymbols,
+    StructureValues,
+)
 
 class Performance(BaseModel):
     class Config:
@@ -18,7 +33,7 @@ class Performance(BaseModel):
     graph: Optional[GraphNames] = None
     
     
-class PerformanceResponse(Performance):
+class PerformanceResponse(BaseModel):
     class Config:
         use_enum_values = True
     
@@ -27,9 +42,30 @@ class PerformanceResponse(Performance):
     ticket: str
     hex_blob: str
     structures: Sequence[ChordSymbolStructures]
-    human_readable: Sequence[Any]
+    human_readable: Sequence[Any] = list()
     nodes: Sequence[Node]
 
+    @root_validator
+    def construct_human_readable(cls, values):
+        if (values.get('nodes') is not None) and (not values.get('human_readable')):
+            # If this check isn't here, somehow it tries to validate Performance instance,
+            # which is in Union[Performance, PerformanceResponse] on PerformanceRequest.
+        
+            names_and_types = [(
+                    NotesSymbol[NotesInt((node.base + values["key"])%12).name].value,
+                    ChordTypes(node.node_id[-1]).name
+                    )
+                for node in values["nodes"]
+                ]
+            flavors = [
+                StructureValues[StructureSymbols(structure[-1]).name].value  # type: ignore Uses enum values
+                for structure in values["structures"]
+            ]
+            values["human_readable"] = list(zip(*zip(*names_and_types), flavors))
+            
+        return values
+        
+    
     @classmethod
     def from_performance(cls, performance: Performance):
         perf_dict = performance.dict()

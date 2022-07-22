@@ -1,4 +1,4 @@
-from typing import Dict, Optional
+from typing import Dict, Optional, Union
 from .inner_models import (
     PathData,
     PerformanceData,
@@ -62,10 +62,10 @@ def construct_user_data(request: GenericRequest) -> UserData:
 def construct_label_data(request: LabelingRequest) -> LabelData:
     return LabelData(sess_id=request.session_id, perf_id=request.ticket, flag=request.flag, user_id=request.user_id)
 
-def construct_progression_request(performance: Performance) -> ProgressionRequest:
+def construct_progression_request(performance: Union[Performance, PerformanceResponse]) -> ProgressionRequest:
     return ProgressionRequest(graph=performance.graph)  # type: ignore Uses enum values
 
-def construct_cheet_sheet(performance: Performance, progression: Optional[Progression] = None) -> CheetSheet:
+def construct_cheet_sheet(performance: Union[PerformanceResponse, Performance], progression: Optional[Progression] = None) -> CheetSheet:
     if progression:
         structures = progression.structures
         bases = [node.base for node in progression.nodes]

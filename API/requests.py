@@ -30,7 +30,7 @@ from .endpoints import (
     ENDPOINTS,
 )
 
-def get_req_progression_generation(performance: Performance) -> Tuple[Endpoint, ProgressionRequest]:
+def get_req_progression_generation(performance: Union[Performance, PerformanceResponse]) -> Tuple[Endpoint, ProgressionRequest]:
     return (ENDPOINTS["micropathforger/generate"], construct_progression_request(performance))
 
 def get_req_progression_amendment(performance: PerformanceResponse, index: int) -> Tuple[Endpoint, Progression]:
@@ -38,7 +38,7 @@ def get_req_progression_amendment(performance: PerformanceResponse, index: int) 
     endpoint.option = str(index)
     return (endpoint, construct_progression(performance))
 
-def get_req_voices_generation(performance: Performance, progression: Optional[Progression] = None) -> Tuple[Endpoint, CheetSheet]:
+def get_req_voices_generation(performance: Union[Performance, PerformanceResponse], progression: Optional[Progression] = None) -> Tuple[Endpoint, CheetSheet]:
     cheetsheet = construct_cheet_sheet(performance, progression=progression)
     endpoint = ENDPOINTS["microvoicemaster/perform"]
     return (endpoint, cheetsheet)

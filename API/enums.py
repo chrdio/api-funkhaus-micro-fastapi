@@ -57,6 +57,20 @@ class NotesInt(IntEnum):
     A_SHARP = 10
     B = 11
 
+class NotesSymbol(Enum):
+    C = 'C'
+    C_SHARP = 'C#'
+    D = 'D'
+    D_SHARP = 'D#'
+    E = 'E'
+    F = 'F'
+    F_SHARP = 'F#'
+    G = 'G'
+    G_SHARP = 'G#'
+    A = 'A'
+    A_SHARP = 'A#'
+    B = 'B'
+
 
 class NodeIDs(Enum):
     NORM1_MAJ = "NORM1+"
@@ -89,3 +103,23 @@ class NodeBase(IntEnum):
     SHRP6_MIN = 9
     FLAT7_MAJ = 10
     SHRP7_MIN = 11
+
+class ChordTypes(Enum):
+    MAJ = '+'
+    MIN = '-'
+    DIM = 'd'
+    AUG = 'a'
+    SUS = 's'
+
+class StructureSymbols(Enum):
+    octave = "8"
+    nineth = "9"
+    seventh = "7"
+    third = "0"
+
+class StructureValues(Enum):
+    octave = None
+    nineth = 9
+    seventh = 7
+    third = None
+
