@@ -37,6 +37,7 @@ from .endpoints import (
     ENDPOINTS
 )
 from .requests import (
+    get_req_progression_amendment,
     get_req_progression_generation,
     get_req_voices_generation,
     get_req_midihex_generation,
