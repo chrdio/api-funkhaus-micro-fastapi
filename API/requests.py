@@ -1,5 +1,8 @@
 from typing import Optional, Tuple, Union
 from pydantic import BaseModel
+from aiohttp import ClientSession
+
+from API.engine import instant_fire_coroutines, post_single_request
 from .adapter_functions import (
     construct_progression_request,
     construct_cheet_sheet,
@@ -56,3 +59,23 @@ def get_req_ensure_music(music: Union[PerformanceData, PathData]) -> Tuple[Endpo
 def get_req_ensure_label(label: LabelData) -> Tuple[Endpoint, LabelData]:
     endpoint = ENDPOINTS["microaccountant/data"]
     return (endpoint, label)
+
+ENSUREMENT_REQUEST_METHODS = {
+    PerformanceData: get_req_ensure_music,
+    PathData: get_req_ensure_music,
+    SessionData: get_req_ensure_session,
+    UserData: get_req_ensure_session,
+    LabelData: get_req_ensure_label,
+}
+
+def submit_data(
+    *data: Union[UserData, SessionData, PerformanceData, PathData, LabelData],
+    storage: set,
+    session: ClientSession,
+    ) -> None:
+    coroutines = [
+        post_single_request(*ENSUREMENT_REQUEST_METHODS[type(data)](data), session=session)
+        for data in data
+        ]
+    new_tasks = instant_fire_coroutines(*coroutines)
+    storage.update(new_tasks)
