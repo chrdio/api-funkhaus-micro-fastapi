@@ -1,6 +1,6 @@
 from .adapter_functions import (
     construct_path_data,
-    construct_performance_data,
+    construct_voicing_data,
     construct_session_data,
     construct_user_data,
     construct_label_data,
@@ -42,7 +42,6 @@ from .requests import (
     get_req_progression_generation,
     get_req_voices_generation,
     get_req_midihex_generation,
-    get_req_ensure_session,
-    get_req_ensure_music,
-    get_req_ensure_label,
+    ENSUREMENT_REQUEST_METHODS,
+    submit_data_tasks,
 )

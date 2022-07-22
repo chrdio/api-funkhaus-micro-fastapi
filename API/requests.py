@@ -68,7 +68,7 @@ ENSUREMENT_REQUEST_METHODS = {
     LabelData: get_req_ensure_label,
 }
 
-def submit_data(
+def submit_data_tasks(
     *data: Union[UserData, SessionData, PerformanceData, PathData, LabelData],
     storage: set,
     session: ClientSession,

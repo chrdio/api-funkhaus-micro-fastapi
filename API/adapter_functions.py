@@ -38,7 +38,7 @@ def construct_path_data(progression: Progression) -> PathData:
     return PathData(nodes=nodes, graph_name=graph)  # type: ignore Uses enum values
 
 
-def construct_performance_data(progression: Progression, cheet_sheet: CheetSheet, pseudo_midi: PseudoMIDI) -> PerformanceData:
+def construct_voicing_data(progression: Progression, cheet_sheet: CheetSheet, pseudo_midi: PseudoMIDI) -> PerformanceData:
     key = cheet_sheet.key
     node_names = [node.node_id for node in progression.nodes]
     structure_names = [
