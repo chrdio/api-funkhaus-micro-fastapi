@@ -12,6 +12,7 @@ from .enums import NotesInt, ChordSymbolStructures, GraphNames, NodeIDs, Perform
 class Performance(BaseModel):
     class Config:
         use_enum_values = True
+        allow_extra = Extra.forbid
 
     key: Optional[NotesInt] = None
     graph: Optional[GraphNames] = None
@@ -23,11 +24,11 @@ class PerformanceResponse(Performance):
     
     key: NotesInt
     graph: GraphNames
-    nodes: Sequence[Node]
-    structures: Sequence[ChordSymbolStructures]
     ticket: str
     hex_blob: str
+    structures: Sequence[ChordSymbolStructures]
     human_readable: Sequence[Any]
+    nodes: Sequence[Node]
 
     @classmethod
     def from_performance(cls, performance: Performance):
@@ -71,13 +72,6 @@ class LabelingRequest(GenericRequest):
 
     _various: Optional[str] = PrivateAttr(default=None)
 
-    @validator("ticket")
-    def ticket_format_valid(cls, v):
-        """Checks if ticket consists of numeric characters."""
-
-        assert v[1:].isnumeric()
-        return v
-
 
 class PerformanceRequest(GenericRequest):
     """A data model with adapters."""
@@ -85,7 +79,7 @@ class PerformanceRequest(GenericRequest):
     class Config:
         use_enum_values = True
 
-    performance_object: Union[Performance, PerformanceResponse] = Performance()
+    performance_object: Union[PerformanceResponse, Performance] = Performance()
 
 class AmendmentRequest(PerformanceRequest):
 
