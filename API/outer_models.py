@@ -85,7 +85,7 @@ class PerformanceResponse(BaseModel):
         default_factory=list,
         title="Human-readable representation",
         description="A list of tuples, each containing a chord symbol, a chord type, and a chord quality.",
-        example=[("C", "major", None), ("D", "minor", None), ("E", "minor", None), ("F", "major", None)],
+        example=[("C", "MAJ", None), ("D", "MIN", None), ("E", "MIN", None), ("F", "MAJ", None)],
     )
     nodes: Sequence[Node] = Field(
         ...,
