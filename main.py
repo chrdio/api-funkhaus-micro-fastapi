@@ -1,15 +1,9 @@
-from email import generator
 import json
 from fastapi import (
     FastAPI,
     Response,
     HTTPException,
-    Body,
-    Query,
-    Header,
     status,
-    Request,
-    Depends,
     Path,
 )
 from API import (
@@ -34,13 +28,13 @@ with open("config.json", "r") as config_file:
     HOST = config["host"]
     RELOAD = config["reload"]
 
-generator_summary = """You can specify the optional key and mode (graph) parameters,
+generation_description = """You can specify the optional key and mode (graph) parameters,
 or even supply the otherwise verbatim progression with a changed key to transpose it."""
 @app.post(
     "/generate",
-    description="Generates a new progression",
-    summary=generator_summary,
-    response_description="The generated progression",
+    summary="Generates a new progression",
+    description=generation_description,
+    response_description="A generated progression",
     response_model=PerformanceResponse,
     status_code=status.HTTP_200_OK,
     )
@@ -53,7 +47,18 @@ async def gen_progression(
         raise HTTPException(status_code=e.status, detail=e.message)
     return responses
 
-@app.post("/amend/{index}")
+
+amendment_description = """It is crucially important to provide a valid performance object,
+copied verbatim from the response of the '/generate' endpoint.
+Can return a 204 'No Content' if the chord change is impossible."""
+@app.post(
+    "/amend/{index}",
+    summary="Changes a specified chord in a progression",
+    description=amendment_description,
+    response_description="An amended progression",
+    response_model=PerformanceResponse,
+    status_code=status.HTTP_200_OK,
+    )
 async def amend_performance(
     full_request: AmendmentRequest,
     index: int = Path(
@@ -73,7 +78,7 @@ async def amend_performance(
 @app.post("/label")
 async def label_progression(labeling_request: LabelingRequest):
     try:
-        responses = await send_labels(labeling_request)
+        await send_labels(labeling_request)
     except ClientResponseError as e:
         raise HTTPException(status_code=e.status, detail=e.message)
     return Response(status_code=201)

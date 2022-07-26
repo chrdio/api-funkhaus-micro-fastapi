@@ -98,7 +98,7 @@ class GenericRequest(BaseModel):
         schema_extra = {
             'example': {
                 'sess_id': IPv4Address('192.0.0.1'),
-                'user_id': UUID('00000000-0000-0000-0000-000000000000'),
+                'user_id': UUID('00000000-SOME-KNOWN-ID-000000000000'),
             }
         }
 
@@ -110,7 +110,7 @@ class LabelingRequest(GenericRequest):
         schema_extra = {
             'example': {
                 'sess_id': IPv4Address('192.0.0.1'),
-                'user_id': UUID('00000000-0000-0000-0000-000000000000'),
+                'user_id': UUID('00000000-SOME-KNOWN-ID-000000000000'),
                 'ticket': '-123581321345589',
                 'flag': PerformanceFlags.served.value,
             }
@@ -130,7 +130,7 @@ class PerformanceRequest(GenericRequest):
         schema_extra = {
             'example': {
                 'sess_id': IPv4Address('192.0.0.1'),
-                'user_id': UUID('00000000-0000-0000-0000-000000000000'),
+                'user_id': UUID('00000000-SOME-KNOWN-ID-000000000000'),
                 'performance_object': {},
                 }
             }
@@ -145,7 +145,7 @@ class AmendmentRequest(PerformanceRequest):
         schema_extra = {
             'example': {
                 'sess_id': IPv4Address('192.0.0.1'),
-                'user_id': UUID('00000000-0000-0000-0000-000000000000'),
+                'user_id': UUID('00000000-SOME-KNOWN-ID-000000000000'),
                 'performance_object': {
                    "warning": "should be copied verbatim from the response, don't try to specify manually"
                 }
