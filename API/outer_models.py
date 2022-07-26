@@ -83,7 +83,7 @@ class PerformanceResponse(BaseModel):
     )
     human_readable: Sequence[Tuple[str, str, Union[int, None]]] = Field(
         default_factory=list,
-        title="Human-readable reprsentation",
+        title="Human-readable representation",
         description="A list of tuples, each containing a chord symbol, a chord type, and a chord quality.",
         example=[("C", "major", None), ("D", "minor", None), ("E", "minor", None), ("F", "major", None)],
     )
