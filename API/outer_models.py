@@ -41,7 +41,7 @@ class PerformanceResponse(BaseModel):
     ticket: str
     hex_blob: str
     structures: Sequence[ChordSymbolStructures]
-    human_readable: Sequence[Any] = list()
+    human_readable: Sequence[Tuple[str, str, Union[int, None]]] = list()
     nodes: Sequence[Node]
 
     @root_validator
