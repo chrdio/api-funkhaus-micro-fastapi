@@ -1,7 +1,25 @@
+from email import generator
 import json
-from fastapi import FastAPI, Response, HTTPException
-from API import PerformanceRequest, LabelingRequest
-from API.outer_models import AmendmentRequest, GenericRequest
+from fastapi import (
+    FastAPI,
+    Response,
+    HTTPException,
+    Body,
+    Query,
+    Header,
+    status,
+    Request,
+    Depends,
+    Path,
+)
+from API import (
+    PerformanceRequest,
+    LabelingRequest,
+    AmendmentRequest,
+    GenericRequest,
+    PerformanceResponse,
+)
+
 from aiohttp import ClientResponseError
 from actions import generate_progression, send_labels, amend_progression, create_user
 app = FastAPI(
@@ -16,9 +34,19 @@ with open("config.json", "r") as config_file:
     HOST = config["host"]
     RELOAD = config["reload"]
 
-
-@app.post("/generate")
-async def gen_progression(performance: PerformanceRequest):
+generator_summary = """You can specify the optional key and mode (graph) parameters,
+or even supply the otherwise verbatim progression with a changed key to transpose it."""
+@app.post(
+    "/generate",
+    description="Generates a new progression",
+    summary=generator_summary,
+    response_description="The generated progression",
+    response_model=PerformanceResponse,
+    status_code=status.HTTP_200_OK,
+    )
+async def gen_progression(
+    performance: PerformanceRequest
+    ):
     try:
         responses = await generate_progression(performance)
     except ClientResponseError as e:
@@ -26,7 +54,15 @@ async def gen_progression(performance: PerformanceRequest):
     return responses
 
 @app.post("/amend/{index}")
-async def amend_performance(full_request: AmendmentRequest, index: int):
+async def amend_performance(
+    full_request: AmendmentRequest,
+    index: int = Path(
+        ...,
+        title="Index",
+        description="The chord under this index will be substituted",
+        example=1,
+        )
+    ):
     try:
         responses = await amend_progression(full_request, index)
     except ClientResponseError as e:
