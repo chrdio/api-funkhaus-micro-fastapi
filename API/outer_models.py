@@ -55,7 +55,7 @@ class PerformanceResponse(BaseModel):
         description="The 0-11 halftone that represents a tonal center.",
         ge=0,
         le=11,
-        example=4,
+        example=0,
         )
     graph: GraphNames = Field(
         ...,
