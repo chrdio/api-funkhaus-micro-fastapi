@@ -28,21 +28,100 @@ class Performance(BaseModel):
         use_enum_values = True
         allow_extra = Extra.forbid
 
-    key: Optional[NotesInt] = None
-    graph: Optional[GraphNames] = None
+    key: Optional[NotesInt] = Field(
+        default=None,
+        title="Key",
+        description="The 0-11 halftone that represents a tonal center.",
+        ge=0,
+        le=11,
+        example=4,
+        )
+    graph: Optional[GraphNames] = Field(
+        default=None,
+        title="Graph",
+        description="Graphs name, usually corresponds to a mode.",
+        example="major_graph",
+    )
     
     
 class PerformanceResponse(BaseModel):
     class Config:
+        title = "Progression/Performance Response Object"
         use_enum_values = True
     
-    key: NotesInt
-    graph: GraphNames
-    ticket: str
-    hex_blob: str
-    structures: Sequence[ChordSymbolStructures]
-    human_readable: Sequence[Tuple[str, str, Union[int, None]]] = list()
-    nodes: Sequence[Node]
+    key: NotesInt = Field(
+        ...,
+        title="Key",
+        description="The 0-11 halftone that represents a tonal center.",
+        ge=0,
+        le=11,
+        example=4,
+        )
+    graph: GraphNames = Field(
+        ...,
+        title="Graph",
+        description="Graphs name, usually corresponds to a mode.",
+        example="major_graph",
+    )
+    ticket: str = Field(
+        ...,
+        title="Ticket",
+        description="A unique identifier for this performance.",
+        example="-123581321345589",
+    )
+    hex_blob: str = Field(
+        ...,
+        title="MIDI",
+        description="A hex-encoded blob of MIDI data.",
+        example="4d54...2f00",
+    )
+    structures: Sequence[ChordSymbolStructures] = Field(
+        ...,
+        title="Structures",
+        description="A corresponding list of interval structures for each chord.",
+        example=["M4Q5O8", "m3Q5O8", "m3Q5O8", "M4Q5O8"],
+    )
+    human_readable: Sequence[Tuple[str, str, Union[int, None]]] = Field(
+        default_factory=list,
+        title="Human-readable reprsentation",
+        description="A list of tuples, each containing a chord symbol, a chord type, and a chord quality.",
+        example=[("C", "major", None), ("D", "minor", None), ("E", "minor", None), ("F", "major", None)],
+    )
+    nodes: Sequence[Node] = Field(
+        ...,
+        title="Chords",
+        description="A list of chord charateristics.",
+        example=[
+            Node(
+                node_id='NORM1+',
+                mode=True,
+                tonality=True,
+                gravity=0,
+                base=0,
+            ),
+            Node(
+                node_id='SHRP2-',
+                mode=True,
+                tonality=False,
+                gravity=-3,
+                base=2,
+            ),
+            Node(
+                node_id='SHRP3-',
+                mode=True,
+                tonality=False,
+                gravity=1,
+                base=4,
+            ),
+            Node(
+                node_id='NORM4+',
+                mode=True,
+                tonality=True,
+                gravity=2,
+                base=5,
+            ),
+        ],
+    )
 
     @root_validator
     def construct_human_readable(cls, values):
