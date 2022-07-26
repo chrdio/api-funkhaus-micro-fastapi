@@ -1,4 +1,3 @@
-import random
 from ipaddress import IPv4Address
 from datetime import datetime
 from typing import Optional, Sequence, Any, Tuple, Union
@@ -89,19 +88,33 @@ class PerformanceResponse(BaseModel):
 
 
 class GenericRequest(BaseModel):
-    class Config:
-        extra = Extra.ignore
-        underscore_attrs_are_private = True
 
     sess_id: IPv4Address
     user_id: Optional[UUID] = None
     _localtime: datetime = PrivateAttr(default_factory=datetime.now)
+
+    class Config:
+        underscore_attrs_are_private = True
+        schema_extra = {
+            'example': {
+                'sess_id': IPv4Address('192.0.0.1'),
+                'user_id': UUID('00000000-0000-0000-0000-000000000000'),
+            }
+        }
 
 
 class LabelingRequest(GenericRequest):
 
     class Config:
         use_enum_values = True
+        schema_extra = {
+            'example': {
+                'sess_id': IPv4Address('192.0.0.1'),
+                'user_id': UUID('00000000-0000-0000-0000-000000000000'),
+                'ticket': '-123581321345589',
+                'flag': PerformanceFlags.served.value,
+            }
+        }
 
     ticket: str
     flag: PerformanceFlags
@@ -114,6 +127,14 @@ class PerformanceRequest(GenericRequest):
 
     class Config:
         use_enum_values = True
+        schema_extra = {
+            'example': {
+                'sess_id': IPv4Address('192.0.0.1'),
+                'user_id': UUID('00000000-0000-0000-0000-000000000000'),
+                'performance_object': {},
+                }
+            }
+
 
     performance_object: Union[PerformanceResponse, Performance] = Performance()
 
@@ -121,5 +142,14 @@ class AmendmentRequest(PerformanceRequest):
 
     class Config:
         use_enum_values = True
+        schema_extra = {
+            'example': {
+                'sess_id': IPv4Address('192.0.0.1'),
+                'user_id': UUID('00000000-0000-0000-0000-000000000000'),
+                'performance_object': {
+                   "warning": "should be copied verbatim from the response, don't try to specify manually"
+                }
+            }
+        }
 
     performance_object:  PerformanceResponse
