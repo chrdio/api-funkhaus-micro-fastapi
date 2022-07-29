@@ -1,12 +1,12 @@
 import asyncio
-import json
-from typing import Any, Optional, Tuple
+from fastapi.encoders import jsonable_encoder
+from typing import Tuple
 from aiohttp import ClientSession
 from pydantic import BaseModel
 from .endpoints import Endpoint
 
 async def post_single_request(endpoint: Endpoint, payload: BaseModel, *, session: ClientSession):
-    serializable = json.loads(payload.json())
+    serializable = jsonable_encoder(payload)
     async with session.post(str(endpoint), json=serializable, raise_for_status=True) as response:
         return await response.text()
 
