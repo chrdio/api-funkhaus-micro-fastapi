@@ -79,7 +79,7 @@ class PerformanceResponse(BaseModel):
         ...,
         title="Structures",
         description="A corresponding list of interval structures for each chord.",
-        example=["M4Q5O8", "m3Q5O8", "m3Q5O8", "M4Q5O8"],
+        example=["M3Q5O8", "m3Q5O8", "m3Q5O8", "M3Q5O8"],
     )
     human_readable: Sequence[Tuple[str, str, Union[int, None]]] = Field(
         default_factory=list,
@@ -114,7 +114,7 @@ class PerformanceResponse(BaseModel):
                 base=4,
             ),
             Node(
-                node_id='NORM4+',
+                node_id='NORM3+',
                 mode=True,
                 tonality=True,
                 gravity=2,
