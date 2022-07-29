@@ -5,6 +5,8 @@ from fastapi import (
     HTTPException,
     status,
     Path,
+    Header,
+    Depends,
 )
 from API import (
     PerformanceRequest,
@@ -13,13 +15,9 @@ from API import (
     GenericRequest,
     PerformanceResponse,
 )
-
 from aiohttp import ClientResponseError
 from actions import generate_progression, send_labels, amend_progression, create_user
-app = FastAPI(
-    title="microfunkhaus",
-    docs_url='/'
-    )
+
 
 with open("config.json", "r") as config_file:
     config = json.load(config_file)
@@ -27,6 +25,21 @@ with open("config.json", "r") as config_file:
     PORT = config["port"]
     HOST = config["host"]
     RELOAD = config["reload"]
+
+with open(".tokens.json", "r") as token_file:
+    TOKENS = set(json.load(token_file))
+
+async def check_token(x_token: str = Header()):
+    if x_token not in TOKENS:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+
+
+app = FastAPI(
+    title="microfunkhaus",
+    docs_url='/',
+    dependencies=[Depends(check_token)],
+    )
+
 
 generation_description = """You can specify the optional key and mode (graph) parameters,
 or even supply the otherwise verbatim progression with a changed key to transpose it."""
