@@ -114,7 +114,7 @@ class PerformanceResponse(BaseModel):
                 base=4,
             ),
             Node(
-                node_id='NORM3+',
+                node_id='NORM4+',
                 mode=True,
                 tonality=True,
                 gravity=2,
