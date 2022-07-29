@@ -1,5 +1,4 @@
 from typing import Optional, Tuple, Union
-from pydantic import BaseModel
 from aiohttp import ClientSession
 
 from API.engine import instant_fire_coroutines, post_single_request
@@ -9,8 +8,6 @@ from .adapter_functions import (
     construct_progression,
 )
 from .inner_models import (
-    PathData,
-    PerformanceData,
     SessionData,
     UserData,
     LabelData,
@@ -21,8 +18,6 @@ from .inner_models import (
 )
 from .outer_models import (
     Performance,
-    GenericRequest,
-    LabelingRequest,
     PerformanceResponse,
 )
 from .endpoints import (
@@ -52,10 +47,6 @@ def get_req_ensure_session(user_session: Union[UserData, SessionData]) -> Tuple[
     endpoint = ENDPOINTS["microaccountant/people"]
     return (endpoint, user_session)
 
-def get_req_ensure_music(music: Union[PerformanceData, PathData]) -> Tuple[Endpoint, Union[PerformanceData, PathData]]:
-    endpoint = ENDPOINTS["microaccountant/music"]
-    return (endpoint, music)
-
 def get_req_ensure_label(label: LabelData) -> Tuple[Endpoint, LabelData]:
     endpoint = ENDPOINTS["microaccountant/data"]
     return (endpoint, label)
@@ -65,15 +56,13 @@ def get_req_user_creation(request: SessionData) -> Tuple[Endpoint, SessionData]:
     return (endpoint, request)
 
 ENSUREMENT_REQUEST_METHODS = {
-    PerformanceData: get_req_ensure_music,
-    PathData: get_req_ensure_music,
     SessionData: get_req_ensure_session,
     UserData: get_req_ensure_session,
     LabelData: get_req_ensure_label,
 }
 
 def submit_data_tasks(
-    *data: Union[UserData, SessionData, PerformanceData, PathData, LabelData],
+    *data: Union[UserData, SessionData, LabelData],
     storage: set,
     session: ClientSession,
     ) -> None:

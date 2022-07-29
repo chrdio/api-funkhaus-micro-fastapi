@@ -18,9 +18,6 @@ from API import (
     construct_session_data,
     construct_user_data,
     construct_label_data,
-    construct_path_data,
-    construct_voicing_data,
-    post_multi_requests,
     post_single_request,
     get_req_midihex_generation,
 )
@@ -45,7 +42,6 @@ async def generate_progression(full_request: PerformanceRequest) -> PerformanceR
     # ensured_session.add_done_callback(task_chest.discard)
     logger_generator.info(f"Submitted the {data_type} data from request")
 
-
     # Alternative if statement somehow breaks the code, hence the try/except
     try:
         progression = construct_progression(performance) # type: ignore
@@ -56,16 +52,11 @@ async def generate_progression(full_request: PerformanceRequest) -> PerformanceR
         progression_raw = await post_single_request(*req_prog, session=local_session)
         progression = Progression.parse_raw(progression_raw) # type: ignore
 
-    
     req_voice = get_req_voices_generation(performance, progression=progression)
     voices_raw = await post_single_request(*req_voice, session=local_session)
     voices = PseudoMIDI.parse_raw(voices_raw) # type: ignore
     cheetsheet = req_voice[1] 
     
-    progression_data = construct_path_data(progression)
-    voicing_data = construct_voicing_data(progression, cheetsheet, voices)
-    submit_data_tasks(progression_data, voicing_data, storage=task_chest, session=local_session)
-
     req_midihex = get_req_midihex_generation(voices)
     midihex_raw = await post_single_request(*req_midihex, session=local_session)
     midihex = json.loads(midihex_raw) # type: ignore
@@ -84,9 +75,9 @@ async def generate_progression(full_request: PerformanceRequest) -> PerformanceR
     except ClientResponseError as e:
         logger_generator.warning(f"Request failed: {e.status} {e.message}")
         raise
-    del task_chest
     await local_session.close()
     logger_generator.info(f"Received all responses from the server.")
+    del task_chest
     return outcoming_performance
 
 async def amend_progression(full_request: AmendmentRequest, index: int) -> PerformanceResponse:
@@ -94,26 +85,20 @@ async def amend_progression(full_request: AmendmentRequest, index: int) -> Perfo
     local_session = ClientSession()
     task_chest = set()
 
+    if full_request.user_id is not None:
+        session_data = construct_user_data(full_request)
+    else:
+        session_data = construct_session_data(full_request)
+    submit_data_tasks(session_data, storage=task_chest, session=local_session)
     
     req_amend_progression = get_req_progression_amendment(old_performance, index)
     new_progression_raw = await post_single_request(*req_amend_progression, session=local_session)
     new_progression = Progression.parse_raw(new_progression_raw) # type: ignore
     
-    
-    if full_request.user_id is not None:
-        session_data = construct_user_data(full_request)
-    else:
-        session_data = construct_session_data(full_request)
-    progression_data = construct_path_data(new_progression)
-    submit_data_tasks(session_data, progression_data, storage=task_chest, session=local_session)
-
     req_voice = get_req_voices_generation(old_performance, progression=new_progression)
     voices_raw = await post_single_request(*req_voice, session=local_session)
     voices = PseudoMIDI.parse_raw(voices_raw) # type: ignore
     cheetsheet = req_voice[1]
-
-    voicing_data = construct_voicing_data(new_progression, cheetsheet, voices)
-    submit_data_tasks(voicing_data, storage=task_chest, session=local_session)
 
     req_midihex = get_req_midihex_generation(voices)
     midihex_raw = await post_single_request(*req_midihex, session=local_session)
@@ -126,9 +111,14 @@ async def amend_progression(full_request: AmendmentRequest, index: int) -> Perfo
         pseudo_midi=voices
     )
 
-    await asyncio.gather(*task_chest)
-    del task_chest
+    try:
+        await asyncio.gather(*task_chest)
+    except ClientResponseError as e:
+        logger_generator.warning(f"Request failed: {e.status} {e.message}")
+        raise
     await local_session.close()
+    del task_chest
+    logger_generator.info(f"Received all responses from the server.")
     return outcoming_performance
 
 
