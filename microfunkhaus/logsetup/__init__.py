@@ -5,7 +5,7 @@ root_logger_name = 'chrdio'
 import json
 
 
-with open("logsetup/logsetup.json", 'r') as f:
+with open("logsetup.json", 'r') as f:
     d = json.load(f)
 LOG_LEVEL = d["logging_level"]
 
