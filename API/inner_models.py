@@ -46,6 +46,7 @@ class PseudoMIDI(BaseModel):
 
 
 class CheetSheet(BaseModel):
+    info: List[Tuple[str, str]]
     structures: List[List[int]]
     special_cases: List[bool]
     bases: List[int]
