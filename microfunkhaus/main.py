@@ -1,7 +1,10 @@
+from ipaddress import IPv4Address
 import json
+from typing import Optional
 from fastapi import (
     FastAPI,
     Response,
+    Request,
     HTTPException,
     status,
     Path,
@@ -40,6 +43,14 @@ app = FastAPI(
     dependencies=[Depends(check_token)],
     )
 
+# Dependency
+def get_real_ip(request: Request) -> Optional[IPv4Address]:
+    client_address = request.client
+    if client_address:
+        return IPv4Address(client_address.host)
+    else:
+        return None
+
 
 generation_description = """You can specify the optional key and mode (graph) parameters,
 or even supply the otherwise verbatim progression with a changed key to transpose it."""
@@ -52,8 +63,10 @@ or even supply the otherwise verbatim progression with a changed key to transpos
     status_code=status.HTTP_200_OK,
     )
 async def gen_progression(
-    performance: PerformanceRequest
+    performance: PerformanceRequest,
+    real_ip = Depends(get_real_ip),
     ):
+    performance.sess_id = real_ip
     try:
         responses = await generate_progression(performance)
     except ClientResponseError as e:
@@ -79,8 +92,10 @@ async def amend_performance(
         title="Index",
         description="The chord under this index will be substituted",
         example=1,
-        )
+        ),
+    real_ip = Depends(get_real_ip),
     ):
+    full_request.sess_id = real_ip
     try:
         responses = await amend_progression(full_request, index)
     except ClientResponseError as e:
@@ -89,7 +104,11 @@ async def amend_performance(
 
 
 @app.post("/label")
-async def label_progression(labeling_request: LabelingRequest):
+async def label_progression(
+    labeling_request: LabelingRequest,
+    real_ip = Depends(get_real_ip),
+    ):
+    labeling_request.sess_id = real_ip
     try:
         await send_labels(labeling_request)
     except ClientResponseError as e:
@@ -97,7 +116,11 @@ async def label_progression(labeling_request: LabelingRequest):
     return Response(status_code=201)
 
 @app.post("/create_user_id")
-async def initialize_user(request: GenericRequest):
+async def initialize_user(
+    request: GenericRequest,
+    real_ip: IPv4Address = Depends(get_real_ip),
+    ):
+    request.sess_id = real_ip
     try:
         user_obj = await create_user(request)
     except ClientResponseError as e:
