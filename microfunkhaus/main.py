@@ -1,5 +1,6 @@
-from ipaddress import IPv4Address
 import json
+import time
+from ipaddress import IPv4Address
 from typing import Optional
 from fastapi import (
     FastAPI,
@@ -42,6 +43,14 @@ app = FastAPI(
     docs_url='/',
     dependencies=[Depends(check_token)],
     )
+
+@app.middleware("http")
+async def add_process_time(request: Request, call_next):
+    start_time = time.time()
+    response = await call_next(request)
+    process_time = (time.time() - start_time) * 1000
+    print(f"Process time: {process_time}ms")
+    return response
 
 # Dependency
 def get_real_ip(request: Request) -> Optional[IPv4Address]:
