@@ -48,8 +48,8 @@ app = FastAPI(
 async def add_process_time(request: Request, call_next):
     start_time = time.time()
     response = await call_next(request)
-    process_time = (time.time() - start_time) * 1000
-    print(f"Process time: {process_time}ms")
+    process_time = round((time.time() - start_time) * 10**6)
+    print(f"Process time: {process_time}µs")
     return response
 
 # Dependency
