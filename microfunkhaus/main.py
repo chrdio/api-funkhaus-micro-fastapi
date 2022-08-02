@@ -12,6 +12,7 @@ from fastapi import (
     Header,
     Depends,
 )
+from fastapi.middleware.cors import CORSMiddleware
 from API import (
     PerformanceRequest,
     LabelingRequest,
@@ -43,7 +44,13 @@ app = FastAPI(
     docs_url='/',
     dependencies=[Depends(check_token)],
     )
-
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 @app.middleware("http")
 async def add_process_time(request: Request, call_next):
     start_time = time.time()
