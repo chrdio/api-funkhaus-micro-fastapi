@@ -2,5 +2,7 @@
     "title": "microfunkhaus",
     "port": 8000,
     "host": "0.0.0.0",
-    "reload": true
+    "reload": true,
+    "keyfile": "/etc/letsencrypt/live/api.chrd.io/privkey.pem",
+    "certfile": "/etc/letsencrypt/live/api.chrd.io/cert.pem"
 }

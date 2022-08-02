@@ -30,6 +30,8 @@ with open("config.json", "r") as config_file:
     PORT = config["port"]
     HOST = config["host"]
     RELOAD = config["reload"]
+    KEYFILE = config["keyfile"]
+    CERTFILE = config["certfile"]
 
 with open(".tokens.json", "r") as token_file:
     TOKENS = set(json.load(token_file))
@@ -146,4 +148,11 @@ async def initialize_user(
 
 if __name__=="__main__":
     import uvicorn
-    uvicorn.run("main:app", host=HOST, port=PORT, reload=RELOAD)
+    uvicorn.run(
+        "main:app",
+        host=HOST,
+        port=PORT,
+        reload=RELOAD,
+        ssl_keyfile=KEYFILE,
+        ssl_certfile=CERTFILE,
+        )
