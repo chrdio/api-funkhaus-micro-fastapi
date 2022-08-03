@@ -85,7 +85,7 @@ class PerformanceResponse(BaseModel):
         default_factory=list,
         title="Human-readable representation",
         description="A list of tuples, each containing a chord symbol, a chord type, and a chord quality.",
-        example=[("C", "MAJ", None), ("D", "MIN", None), ("E", "MIN", None), ("F", "MAJ", None)],
+        example=[("C", "maj", None), ("D", "min", None), ("E", "min", None), ("F", "maj", None)],
     )
     nodes: Sequence[Node] = Field(
         ...,
@@ -131,7 +131,7 @@ class PerformanceResponse(BaseModel):
         
             names_and_types = [(
                     NotesSymbol[NotesInt((node.base + values["key"])%12).name].value,
-                    ChordTypes(node.node_id[-1]).name
+                    ChordTypes(node.node_id[-1]).name.lower()
                     )
                 for node in values["nodes"]
                 ]
