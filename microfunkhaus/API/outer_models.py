@@ -81,6 +81,12 @@ class PerformanceResponse(BaseModel):
         description="A corresponding list of interval structures for each chord.",
         example=["M3Q5O8", "m3Q5O8", "m3Q5O8", "M3Q5O8"],
     )
+    changeabilities: Sequence[bool] = Field(
+        ...,
+        title="Changeabilities",
+        description="A list of booleans, each representing whether a chord can be changed.",
+        example=[True, True, True, True],
+    )
     human_readable: Sequence[Tuple[str, str, Union[int, None]]] = Field(
         default_factory=list,
         title="Human-readable representation",
@@ -122,6 +128,7 @@ class PerformanceResponse(BaseModel):
             ),
         ],
     )
+
 
     @root_validator
     def construct_human_readable(cls, values):

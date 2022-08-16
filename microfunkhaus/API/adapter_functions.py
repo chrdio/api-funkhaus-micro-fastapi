@@ -94,7 +94,7 @@ def construct_progression(performance: PerformanceResponse) -> Progression:
         ChordIntervalStructures[ChordSymbolStructures(struc).name]
         for struc in performance.structures
         ]
-    return Progression(graph=performance.graph, nodes=nodes, structures=structures)
+    return Progression(graph=performance.graph, nodes=nodes, structures=structures, changeabilities=performance.changeabilities)
 
 def construct_performance(*, progression: Progression, cheet_sheet: CheetSheet, pseudo_midi: PseudoMIDI, hex_blob: str) -> PerformanceResponse:
     structure_names = [ChordSymbolStructures(ChordIntervalStructures(structure).name) for structure in progression.structures] # type: ignore Uses enum values
@@ -105,7 +105,8 @@ def construct_performance(*, progression: Progression, cheet_sheet: CheetSheet, 
         hex_blob=hex_blob,
         human_readable=list(list()),
         structures=structure_names,
-        ticket=pseudo_midi.ticket
+        ticket=pseudo_midi.ticket,
+        changeabilities=progression.changeabilities,
         )
     
     return performance

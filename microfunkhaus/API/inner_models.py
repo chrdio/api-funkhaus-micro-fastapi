@@ -76,6 +76,7 @@ class Progression(BaseModel):
     nodes: Sequence[Node]
     structures: Sequence[ChordIntervalStructures]
     orderings: Optional[Tuple[str, ...]] = None
+    changeabilities: Sequence[bool]
 
     class Config:
         use_enum_values = True
