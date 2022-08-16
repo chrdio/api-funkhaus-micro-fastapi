@@ -153,6 +153,6 @@ if __name__=="__main__":
         host=HOST,
         port=PORT,
         reload=RELOAD,
-        # ssl_keyfile=KEYFILE,
-        # ssl_certfile=CERTFILE,
+        ssl_keyfile=KEYFILE,
+        ssl_certfile=CERTFILE,
         )
