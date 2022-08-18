@@ -138,17 +138,17 @@ async def label_progression(
         raise HTTPException(status_code=e.status, detail=e.message)
     return Response(status_code=201)
 
-@app.post("/create_user_id")
-async def initialize_user(
-    request: GenericRequest,
-    real_ip: IPv4Address = Depends(get_real_ip),
-    ):
-    request.sess_id = real_ip
-    try:
-        user_obj = await create_user(request)
-    except ClientResponseError as e:
-        raise HTTPException(status_code=e.status, detail=e.message)
-    return Response(content=user_obj.json(), status_code=201, media_type="application/json")
+# @app.post("/create_user_id")
+# async def initialize_user(
+#     request: GenericRequest,
+#     real_ip: IPv4Address = Depends(get_real_ip),
+#     ):
+#     request.sess_id = real_ip
+#     try:
+#         user_obj = await create_user(request)
+#     except ClientResponseError as e:
+#         raise HTTPException(status_code=e.status, detail=e.message)
+#     return Response(content=user_obj.json(), status_code=201, media_type="application/json")
 
 
 if __name__=="__main__":
