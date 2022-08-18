@@ -20,8 +20,13 @@ from API import (
     GenericRequest,
     PerformanceResponse,
 )
+from actions import (
+    generate_progression,
+    send_labels,
+    amend_progression,
+    create_user
+)
 from aiohttp import ClientResponseError
-from actions import generate_progression, send_labels, amend_progression, create_user
 
 
 with open("config.json", "r") as config_file:

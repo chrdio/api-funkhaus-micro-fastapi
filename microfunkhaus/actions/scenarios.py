@@ -20,8 +20,8 @@ from API import (
     construct_label_data,
     post_single_request,
     get_req_midihex_generation,
+    GenericRequest,
 )
-from API.outer_models import GenericRequest
 from logsetup import get_logger
 
 logger_generator = get_logger("generate_performance")
@@ -32,7 +32,7 @@ async def generate_progression(full_request: PerformanceRequest) -> PerformanceR
     
     perf_name = performance.__class__.__name__
     
-    if full_request.user_id is not None:
+    if full_request.user_object is not None:
         data_type = "user"
         session_data = construct_user_data(full_request)
     else:
@@ -85,7 +85,7 @@ async def amend_progression(full_request: AmendmentRequest, index: int) -> Perfo
     local_session = ClientSession()
     task_chest = set()
 
-    if full_request.user_id is not None:
+    if full_request.user_object is not None:
         session_data = construct_user_data(full_request)
     else:
         session_data = construct_session_data(full_request)
@@ -126,7 +126,7 @@ async def send_labels(labeling_request: LabelingRequest) -> bool:
     local_session = ClientSession()
     task_chest = set()
 
-    if labeling_request.user_id is not None:
+    if labeling_request.user_object is not None:
         session_data = construct_user_data(labeling_request)
     else:
         session_data = construct_session_data(labeling_request)

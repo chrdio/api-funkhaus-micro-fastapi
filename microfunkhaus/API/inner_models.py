@@ -1,10 +1,46 @@
 from ipaddress import IPv4Address
 import random
 from uuid import UUID
-from pydantic import BaseModel, PrivateAttr, root_validator, Field, validator
+from pydantic import BaseModel, PrivateAttr, root_validator, Field, validator, EmailStr, Extra
 from typing import List, Optional, Sequence, Tuple
 from datetime import datetime
+
 from .enums import ChordIntervalStructures, NotesInt, PerformanceFlags, GraphNames
+
+
+class GenericUser(BaseModel):
+    class Config:
+        title = "Generic User Object"
+        use_enum_values = True
+        allow_extra = Extra.forbid
+    
+    email: EmailStr = Field(
+        ...,
+        title="Email",
+        description="The user's email address.",
+        example="ada.lovelace@aol.com",
+    )
+
+    name_given: str = Field(
+        ...,
+        title="Given Name",
+        description="The given name of the user.",
+        example="Ada",
+    )
+    name_family: str = Field(
+        ...,
+        title="Family Name",
+        description="The family name of the user.",
+        example="Lovelace",
+    )
+
+class UserData(BaseModel):
+    user_object: GenericUser
+    sess_id: IPv4Address
+
+
+class SessionData(BaseModel):
+    sess_id: IPv4Address
 
 
 class PathData(BaseModel):
@@ -18,21 +54,12 @@ class PerformanceData(BaseModel):
     path_nodes: List[Tuple[str, str]]
 
 
-class SessionData(BaseModel):
-    sess_id: IPv4Address
-
-
-class UserData(BaseModel):
-    user_id: UUID
-    sess_id: IPv4Address
-
-
 class LabelData(BaseModel):
     _localtime: datetime = PrivateAttr(default_factory=datetime.now)
     sess_id: IPv4Address
     perf_id: str
     flag: PerformanceFlags
-    user_id: Optional[UUID] = None
+    user_email: Optional[EmailStr] = None
     _various: Optional[str] = None
 
     class Config:

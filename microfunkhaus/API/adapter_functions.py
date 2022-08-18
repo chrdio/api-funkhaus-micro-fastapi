@@ -1,4 +1,5 @@
 from typing import Dict, Optional, Union
+from pydantic import EmailStr
 from .inner_models import (
     PathData,
     PerformanceData,
@@ -50,13 +51,16 @@ def construct_session_data(request: GenericRequest) -> SessionData:
     return SessionData(sess_id=request.sess_id)
 
 def construct_user_data(request: GenericRequest) -> UserData:
-    if request.user_id:
-        return UserData(user_id=request.user_id, sess_id=request.sess_id)
+    if request.user_object:
+        return UserData(user_object=request.user_object, sess_id=request.sess_id)
     else:
-        raise ValueError('No user ID provided')
+        raise ValueError('No user data provided')
 
 def construct_label_data(request: LabelingRequest) -> LabelData:
-    return LabelData(sess_id=request.sess_id, perf_id=request.ticket, flag=request.flag, user_id=request.user_id)
+    if request.user_object:
+        return LabelData(sess_id=request.sess_id, perf_id=request.ticket, flag=request.flag, user_email=EmailStr(request.user_object.email))
+    else:
+        raise ValueError('No user data provided')
 
 def construct_progression_request(performance: Union[Performance, PerformanceResponse]) -> ProgressionRequest:
     return ProgressionRequest(graph=performance.graph)  # type: ignore Uses enum values

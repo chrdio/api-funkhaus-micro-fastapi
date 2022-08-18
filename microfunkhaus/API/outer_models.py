@@ -8,9 +8,10 @@ from pydantic import(
     PrivateAttr,
     Extra,
     Field,
+    EmailStr
 )
 
-from API.inner_models import Node
+from .inner_models import Node, GenericUser
 
 from .enums import (
     NotesInt,
@@ -171,12 +172,10 @@ class PerformanceResponse(BaseModel):
             raise ValueError('Performance is missing required values to create a PerformanceResponse')
 
 
-
-
 class GenericRequest(BaseModel):
 
     sess_id: IPv4Address
-    user_id: Optional[UUID] = None
+    user_object: Optional[GenericUser] = None
     _localtime: datetime = PrivateAttr(default_factory=datetime.now)
 
     class Config:
@@ -184,7 +183,7 @@ class GenericRequest(BaseModel):
         schema_extra = {
             'example': {
                 'sess_id': IPv4Address('192.0.0.1'),
-                'user_id': '00000000-SOME-KNOWN-ID-000000000000',
+                'user_object': GenericUser(email=EmailStr("ada.lovelace@aol.com"), name_given="Ada", name_family="Lovelace"),
             }
         }
 
@@ -196,7 +195,7 @@ class LabelingRequest(GenericRequest):
         schema_extra = {
             'example': {
                 'sess_id': IPv4Address('192.0.0.1'),
-                'user_id': '00000000-SOME-KNOWN-ID-000000000000',
+                'user_object': GenericUser(email=EmailStr("ada.lovelace@aol.com"), name_given="Ada", name_family="Lovelace"),
                 'ticket': '-123581321345589',
                 'flag': PerformanceFlags.served.value,
             }
@@ -216,7 +215,7 @@ class PerformanceRequest(GenericRequest):
         schema_extra = {
             'example': {
                 'sess_id': IPv4Address('192.0.0.1'),
-                'user_id': '00000000-SOME-KNOWN-ID-000000000000',
+                'user_object': GenericUser(email=EmailStr("ada.lovelace@aol.com"), name_given="Ada", name_family="Lovelace"),
                 'performance_object': {},
                 }
             }
@@ -231,7 +230,7 @@ class AmendmentRequest(PerformanceRequest):
         schema_extra = {
             'example': {
                 'sess_id': IPv4Address('192.0.0.1'),
-                'user_id': '00000000-SOME-KNOWN-ID-000000000000',
+                'user_object': GenericUser(email=EmailStr("ada.lovelace@aol.com"), name_given="Ada", name_family="Lovelace"),
                 'performance_object': {
                    "warning": "should be copied verbatim from the response, don't try to specify manually"
                 }
