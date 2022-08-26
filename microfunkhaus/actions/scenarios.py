@@ -1,14 +1,13 @@
 import json
 import asyncio
 from aiohttp import ClientSession, ClientResponseError
+from chrdiotypes.musical import PseudoMIDI, ProgressionFields
 from API import (
     get_req_progression_generation,
     get_req_progression_amendment,
     get_req_voices_generation,
     get_req_user_creation,
     submit_data_tasks,
-    PseudoMIDI,
-    Progression,
     PerformanceRequest,
     AmendmentRequest,
     LabelingRequest,
@@ -44,22 +43,22 @@ async def generate_progression(full_request: PerformanceRequest) -> PerformanceR
 
     # Alternative if statement somehow breaks the code, hence the try/except
     try:
-        progression = construct_progression(performance) # type: ignore
+        progression = construct_progression(performance) # type: ignore PerformanceResponse
         logger_generator.info(f"Parsed a progression from {perf_name}")
     except AttributeError:
         logger_generator.info(f"Can't parse a progression from {perf_name}: requesting a new one")
         req_prog = get_req_progression_generation(performance)
         progression_raw = await post_single_request(*req_prog, session=local_session)
-        progression = Progression.parse_raw(progression_raw) # type: ignore
+        progression = ProgressionFields.parse_raw(progression_raw)
 
     req_voice = get_req_voices_generation(performance, progression=progression)
     voices_raw = await post_single_request(*req_voice, session=local_session)
-    voices = PseudoMIDI.parse_raw(voices_raw) # type: ignore
+    voices = PseudoMIDI.parse_raw(voices_raw)
     cheetsheet = req_voice[1] 
     
     req_midihex = get_req_midihex_generation(voices)
     midihex_raw = await post_single_request(*req_midihex, session=local_session)
-    midihex = json.loads(midihex_raw) # type: ignore
+    midihex = json.loads(midihex_raw)
     logger_generator.info(f"Requested a new hex-encoded midi.")
 
     outcoming_performance = construct_performance(
@@ -93,16 +92,16 @@ async def amend_progression(full_request: AmendmentRequest, index: int) -> Perfo
     
     req_amend_progression = get_req_progression_amendment(old_performance, index)
     new_progression_raw = await post_single_request(*req_amend_progression, session=local_session)
-    new_progression = Progression.parse_raw(new_progression_raw) # type: ignore
+    new_progression = ProgressionFields.parse_raw(new_progression_raw)
     
     req_voice = get_req_voices_generation(old_performance, progression=new_progression)
     voices_raw = await post_single_request(*req_voice, session=local_session)
-    voices = PseudoMIDI.parse_raw(voices_raw) # type: ignore
+    voices = PseudoMIDI.parse_raw(voices_raw)
     cheetsheet = req_voice[1]
 
     req_midihex = get_req_midihex_generation(voices)
     midihex_raw = await post_single_request(*req_midihex, session=local_session)
-    midihex = json.loads(midihex_raw) # type: ignore
+    midihex = json.loads(midihex_raw)
 
     outcoming_performance = construct_performance(
         progression=new_progression,
@@ -146,7 +145,7 @@ async def create_user(userinit_request: GenericRequest) -> GenericRequest:
     session_data = construct_session_data(userinit_request)
     user_request = get_req_user_creation(session_data)
     user_raw = await post_single_request(*user_request, session=local_session)
-    user_obj = GenericRequest.parse_raw(user_raw) # type: ignore
+    user_obj = GenericRequest.parse_raw(user_raw)
     
     await local_session.close()
     return user_obj

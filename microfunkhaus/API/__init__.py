@@ -7,17 +7,6 @@ from .adapter_functions import (
     construct_performance,
     construct_progression
 )
-from .inner_models import (
-    PathData,
-    PerformanceData,
-    SessionData,
-    UserData,
-    LabelData,
-    PseudoMIDI,
-    CheetSheet,
-    ProgressionRequest,
-    Progression,
-)
 from .outer_models import (
     Performance,
     GenericRequest,
