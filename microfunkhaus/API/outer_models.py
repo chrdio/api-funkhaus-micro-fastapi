@@ -1,32 +1,58 @@
 from ipaddress import IPv4Address
 from datetime import datetime
-from typing import Optional, Sequence, Any, Tuple, Union
-from uuid import UUID
+from typing import Optional, Sequence, Tuple, Union
 from pydantic import(
-    BaseModel,
     root_validator,
     PrivateAttr,
-    Extra,
     Field,
-    EmailStr
+    EmailStr,
+    Extra,
 )
 
-from .inner_models import Node, GenericUser
-
-from .enums import (
+from chrdiotypes.data_enums import (
+    ChordGravities,
+    NodeIDs,
     NotesInt,
-    NotesSymbol,
+    NotesSym,
     ChordSymbolStructures,
     GraphNames,
     PerformanceFlags,
     ChordTypes,
     StructureSymbols,
     StructureValues,
+    BaseModel
 )
+
+from chrdiotypes.transport import GenericUser
+from chrdiotypes.musical import NodeFields
+
+
+class User(GenericUser):
+    class Config:
+        title = "Generic User Object"
+    
+    email: EmailStr = Field(
+        ...,
+        title="Email",
+        description="The user's email address.",
+        example="ada.lovelace@aol.com",
+    )
+
+    name_given: str = Field(
+        ...,
+        title="Given Name",
+        description="The given name of the user.",
+        example="Ada",
+    )
+    name_family: str = Field(
+        ...,
+        title="Family Name",
+        description="The family name of the user.",
+        example="Lovelace",
+    )
 
 class Performance(BaseModel):
     class Config:
-        use_enum_values = True
         allow_extra = Extra.forbid
 
     key: Optional[NotesInt] = Field(
@@ -48,7 +74,6 @@ class Performance(BaseModel):
 class PerformanceResponse(BaseModel):
     class Config:
         title = "Progression/Performance Response Object"
-        use_enum_values = True
     
     key: NotesInt = Field(
         ...,
@@ -94,38 +119,38 @@ class PerformanceResponse(BaseModel):
         description="A list of tuples, each containing a chord symbol, a chord type, and a chord quality.",
         example=[("C", "maj", None), ("D", "min", None), ("E", "min", None), ("F", "maj", None)],
     )
-    nodes: Sequence[Node] = Field(
+    nodes: Sequence[NodeFields] = Field(
         ...,
         title="Chords",
         description="A list of chord charateristics.",
         example=[
-            Node(
-                node_id='NORM1+',
+            NodeFields(
+                node_id=NodeIDs('NORM1+'),
                 mode=True,
                 tonality=True,
-                gravity=0,
-                base=0,
+                gravity=ChordGravities(0),
+                base=NotesInt(0),
             ),
-            Node(
-                node_id='SHRP2-',
+            NodeFields(
+                node_id=NodeIDs('SHRP2-'),
                 mode=True,
                 tonality=False,
-                gravity=-3,
-                base=2,
+                gravity=ChordGravities(-3),
+                base=NotesInt(2),
             ),
-            Node(
-                node_id='SHRP3-',
+            NodeFields(
+                node_id=NodeIDs('SHRP3-'),
                 mode=True,
                 tonality=False,
-                gravity=1,
-                base=4,
+                gravity=ChordGravities(1),
+                base=NotesInt(4),
             ),
-            Node(
-                node_id='NORM4+',
+            NodeFields(
+                node_id=NodeIDs('NORM4+'),
                 mode=True,
                 tonality=True,
-                gravity=2,
-                base=5,
+                gravity=ChordGravities(2),
+                base=NotesInt(5),
             ),
         ],
     )
@@ -138,13 +163,13 @@ class PerformanceResponse(BaseModel):
             # which is in Union[Performance, PerformanceResponse] on PerformanceRequest.
         
             names_and_types = [(
-                    NotesSymbol[NotesInt((node.base + values["key"])%12).name].value,
+                    NotesSym[NotesInt((node.base + values["key"])%12).name].value,
                     ChordTypes(node.node_id[-1]).name.lower()
                     )
                 for node in values["nodes"]
                 ]
             flavors = [
-                StructureValues[StructureSymbols(structure[-1]).name].value  # type: ignore Uses enum values
+                StructureValues[StructureSymbols(structure[-1]).name].value
                 for structure in values["structures"]
             ]
             values["human_readable"] = list(zip(*zip(*names_and_types), flavors))
@@ -152,30 +177,30 @@ class PerformanceResponse(BaseModel):
         return values
         
     
-    @classmethod
-    def from_performance(cls, performance: Performance):
-        perf_dict = performance.dict()
-        has_all_values = all(
-            perf_dict.get(key)
-            for key in [
-                'key',
-                'graph',
-                'nodes',
-                'structures',
-                'hex_blob',
-                'human_readable'
-                ]
-        )
-        if has_all_values:
-            return cls(**perf_dict)
-        else:
-            raise ValueError('Performance is missing required values to create a PerformanceResponse')
+    # @classmethod
+    # def from_performance(cls, performance: Performance):
+    #     perf_dict = performance.dict()
+    #     has_all_values = all(
+    #         perf_dict.get(key)
+    #         for key in [
+    #             'key',
+    #             'graph',
+    #             'nodes',
+    #             'structures',
+    #             'hex_blob',
+    #             'human_readable'
+    #             ]
+    #     )
+    #     if has_all_values:
+    #         return cls(**perf_dict)
+    #     else:
+    #         raise ValueError('Performance is missing required values to create a PerformanceResponse')
 
 
 class GenericRequest(BaseModel):
 
     sess_id: IPv4Address
-    user_object: Optional[GenericUser] = None
+    user_object: Optional[User] = None
     _localtime: datetime = PrivateAttr(default_factory=datetime.now)
 
     class Config:
@@ -183,7 +208,7 @@ class GenericRequest(BaseModel):
         schema_extra = {
             'example': {
                 'sess_id': IPv4Address('192.0.0.1'),
-                'user_object': GenericUser(email=EmailStr("ada.lovelace@aol.com"), name_given="Ada", name_family="Lovelace"),
+                'user_object': User(email=EmailStr("ada.lovelace@aol.com"), name_given="Ada", name_family="Lovelace"),
             }
         }
 
@@ -191,11 +216,10 @@ class GenericRequest(BaseModel):
 class LabelingRequest(GenericRequest):
 
     class Config:
-        use_enum_values = True
         schema_extra = {
             'example': {
                 'sess_id': IPv4Address('192.0.0.1'),
-                'user_object': GenericUser(email=EmailStr("ada.lovelace@aol.com"), name_given="Ada", name_family="Lovelace"),
+                'user_object': User(email=EmailStr("ada.lovelace@aol.com"), name_given="Ada", name_family="Lovelace"),
                 'ticket': '-123581321345589',
                 'flag': PerformanceFlags.served.value,
             }
@@ -211,11 +235,10 @@ class PerformanceRequest(GenericRequest):
     """A data model with adapters."""
 
     class Config:
-        use_enum_values = True
         schema_extra = {
             'example': {
                 'sess_id': IPv4Address('192.0.0.1'),
-                'user_object': GenericUser(email=EmailStr("ada.lovelace@aol.com"), name_given="Ada", name_family="Lovelace"),
+                'user_object': User(email=EmailStr("ada.lovelace@aol.com"), name_given="Ada", name_family="Lovelace"),
                 'performance_object': {},
                 }
             }
@@ -226,11 +249,10 @@ class PerformanceRequest(GenericRequest):
 class AmendmentRequest(PerformanceRequest):
 
     class Config:
-        use_enum_values = True
         schema_extra = {
             'example': {
                 'sess_id': IPv4Address('192.0.0.1'),
-                'user_object': GenericUser(email=EmailStr("ada.lovelace@aol.com"), name_given="Ada", name_family="Lovelace"),
+                'user_object': User(email=EmailStr("ada.lovelace@aol.com"), name_given="Ada", name_family="Lovelace"),
                 'performance_object': {
                    "warning": "should be copied verbatim from the response, don't try to specify manually"
                 }

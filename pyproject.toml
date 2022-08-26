@@ -1,15 +1,16 @@
 [tool.poetry]
 name = "microfunkhaus"
-version = "0.1.0"
+version = "0.1.1"
 description = "A facade/gateway microservice to rule them all."
 authors = ["Arthur Ryzhak <ryzhakar@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.9"
 fastapi = "^0.79"
 aiohttp = "^3.8.1"
 uvicorn = "^0.18.2"
 email-validator = "^1.2.1"
+chrdiotypes = {path = "../chrdiotypes/dist/chrdiotypes-0.1.0-py3-none-any.whl"}
 
 [tool.poetry.dev-dependencies]
 
