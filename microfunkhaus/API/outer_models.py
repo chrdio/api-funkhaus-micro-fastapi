@@ -7,6 +7,7 @@ from pydantic import(
     Field,
     EmailStr,
     Extra,
+    BaseModel
 )
 
 from chrdiotypes.data_enums import (
@@ -20,7 +21,7 @@ from chrdiotypes.data_enums import (
     ChordTypes,
     StructureSymbols,
     StructureValues,
-    BaseModel
+    enum_encoders,
 )
 
 from chrdiotypes.transport import GenericUser
@@ -29,6 +30,7 @@ from chrdiotypes.musical import NodeFields
 
 class User(GenericUser):
     class Config:
+        json_encoders=enum_encoders
         title = "Generic User Object"
     
     email: EmailStr = Field(
@@ -53,6 +55,7 @@ class User(GenericUser):
 
 class Performance(BaseModel):
     class Config:
+        json_encoders=enum_encoders
         allow_extra = Extra.forbid
 
     key: Optional[NotesInt] = Field(
@@ -73,6 +76,7 @@ class Performance(BaseModel):
     
 class PerformanceResponse(BaseModel):
     class Config:
+        json_encoders=enum_encoders
         title = "Progression/Performance Response Object"
     
     key: NotesInt = Field(
@@ -204,6 +208,7 @@ class GenericRequest(BaseModel):
     _localtime: datetime = PrivateAttr(default_factory=datetime.now)
 
     class Config:
+        json_encoders=enum_encoders
         underscore_attrs_are_private = True
         schema_extra = {
             'example': {
@@ -216,6 +221,7 @@ class GenericRequest(BaseModel):
 class LabelingRequest(GenericRequest):
 
     class Config:
+        json_encoders=enum_encoders
         schema_extra = {
             'example': {
                 'sess_id': IPv4Address('192.0.0.1'),
@@ -235,6 +241,7 @@ class PerformanceRequest(GenericRequest):
     """A data model with adapters."""
 
     class Config:
+        json_encoders=enum_encoders
         schema_extra = {
             'example': {
                 'sess_id': IPv4Address('192.0.0.1'),
@@ -249,6 +256,7 @@ class PerformanceRequest(GenericRequest):
 class AmendmentRequest(PerformanceRequest):
 
     class Config:
+        json_encoders=enum_encoders
         schema_extra = {
             'example': {
                 'sess_id': IPv4Address('192.0.0.1'),

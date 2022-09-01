@@ -2,7 +2,7 @@ import json
 import asyncio
 from aiohttp import ClientSession, ClientResponseError
 from chrdiotypes.musical import PseudoMIDI, ProgressionFields
-from API import (
+from ..API import (
     get_req_progression_generation,
     get_req_progression_amendment,
     get_req_voices_generation,
@@ -21,7 +21,7 @@ from API import (
     get_req_midihex_generation,
     GenericRequest,
 )
-from logsetup import get_logger
+from ..logsetup import get_logger
 
 logger_generator = get_logger("generate_performance")
 async def generate_progression(full_request: PerformanceRequest) -> PerformanceResponse:

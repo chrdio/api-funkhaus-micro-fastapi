@@ -12,29 +12,24 @@ from fastapi import (
     Header,
     Depends,
 )
+from aiohttp import ClientResponseError
 from fastapi.middleware.cors import CORSMiddleware
-from API import (
+from .API import (
     PerformanceRequest,
     LabelingRequest,
     AmendmentRequest,
     PerformanceResponse,
 )
-from actions import (
+from .actions import (
     generate_progression,
     send_labels,
     amend_progression,
 )
-from aiohttp import ClientResponseError
 
 
 with open("config.json", "r") as config_file:
     config = json.load(config_file)
     TITLE = config["title"]
-    PORT = config["port"]
-    HOST = config["host"]
-    RELOAD = config["reload"]
-    KEYFILE = config["keyfile"]
-    CERTFILE = config["certfile"]
 
 with open(".tokens.json", "r") as token_file:
     TOKENS = set(json.load(token_file))
@@ -135,15 +130,3 @@ async def label_progression(
     except ClientResponseError as e:
         raise HTTPException(status_code=e.status, detail=e.message)
     return Response(status_code=201)
-
-
-if __name__=="__main__":
-    import uvicorn
-    uvicorn.run(
-        "main:app",
-        host=HOST,
-        port=PORT,
-        reload=RELOAD,
-        ssl_keyfile=KEYFILE,
-        ssl_certfile=CERTFILE,
-        )

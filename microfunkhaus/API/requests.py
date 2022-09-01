@@ -1,7 +1,7 @@
 from typing import Optional, Tuple, Union
 from aiohttp import ClientSession
 
-from API.engine import instant_fire_coroutines, post_single_request
+from .engine import instant_fire_coroutines, post_single_request
 from .adapter_functions import (
     construct_progression_request,
     construct_cheet_sheet,
