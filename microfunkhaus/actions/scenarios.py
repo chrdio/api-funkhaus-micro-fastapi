@@ -1,7 +1,9 @@
 import json
 import asyncio
+from typing import Sequence
 from aiohttp import ClientSession, ClientResponseError
 from chrdiotypes.musical import PseudoMIDI, ProgressionFields
+
 from ..API import (
     get_req_progression_generation,
     get_req_progression_amendment,
@@ -19,7 +21,9 @@ from ..API import (
     construct_label_data,
     post_single_request,
     get_req_midihex_generation,
+    ping_dependency,
     GenericRequest,
+    Endpoint,
 )
 from ..logsetup import get_logger
 
@@ -149,3 +153,11 @@ async def create_user(userinit_request: GenericRequest) -> GenericRequest:
     
     await local_session.close()
     return user_obj
+
+async def healthcheck_dependencies(deps: Sequence[Endpoint]):
+    session = ClientSession()
+    async with session:
+        oks = await asyncio.gather(
+            *(ping_dependency(e, session=session) for e in deps)
+        )
+    return all(oks)

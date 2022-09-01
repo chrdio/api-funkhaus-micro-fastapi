@@ -12,18 +12,20 @@ from fastapi import (
     Header,
     Depends,
 )
-from aiohttp import ClientResponseError
+from aiohttp import ClientResponseError, ClientConnectionError
 from fastapi.middleware.cors import CORSMiddleware
 from .API import (
     PerformanceRequest,
     LabelingRequest,
     AmendmentRequest,
     PerformanceResponse,
+    HEALTHPOINTS,
 )
 from .actions import (
     generate_progression,
     send_labels,
     amend_progression,
+    healthcheck_dependencies,
 )
 
 
@@ -66,6 +68,18 @@ def get_real_ip(request: Request) -> Optional[IPv4Address]:
         return IPv4Address(client_address.host)
     else:
         return None
+
+
+@app.on_event("startup")
+async def startup_event():
+    ok = False
+    try:
+        ok = await healthcheck_dependencies(HEALTHPOINTS)
+    finally:
+        if not ok:
+            print("Could not establish connections to all of the microservices.")
+        else:
+            print("Connections to all of the microservices are established.")
 
 
 generation_description = """You can specify the optional key and mode (graph) parameters,
