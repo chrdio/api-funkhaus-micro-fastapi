@@ -130,3 +130,7 @@ async def label_progression(
     except ClientResponseError as e:
         raise HTTPException(status_code=e.status, detail=e.message)
     return Response(status_code=201)
+
+@app.get("/healthcheck")
+async def healthcheck():
+    return Response(status_code=200)
