@@ -1,3 +1,4 @@
+import random
 from typing import Optional, Union
 from pydantic import EmailStr
 from chrdiotypes.transport import (
@@ -53,7 +54,7 @@ def construct_session_data(request: GenericRequest) -> SessionTransport:
 
 def construct_user_data(request: GenericRequest) -> UserTransport:
     if request.user_object:
-        user_object = GenericUser.from_raw(request.user_object.json())  # type: ignore Somehow pylance doesn't recognize it as pydantic model
+        user_object = GenericUser.parse_raw(request.user_object.json())
         return UserTransport(user_object=user_object, sess_id=request.sess_id)
     else:
         raise ValueError('No user data provided')
@@ -63,7 +64,8 @@ def construct_label_data(request: LabelingRequest) -> LabelTransport:
         mailbox = str(request.user_object.email)
         return LabelTransport(sess_id=request.sess_id, perf_id=request.ticket, flag=request.flag, email=mailbox)
     else:
-        raise ValueError('No user data provided')
+        return LabelTransport(sess_id=request.sess_id, perf_id=request.ticket, flag=request.flag)
+            
 
 def construct_progression_request(performance: Union[Performance, PerformanceResponse]) -> ProgressionRequest:
     return ProgressionRequest(graph=performance.graph) # type: ignore Handled in the receiving side (Randomized if None)
@@ -91,9 +93,10 @@ def construct_cheet_sheet(performance: Union[PerformanceResponse, Performance], 
         key = performance.key
     except AttributeError:
         raise ValueError('Not enough data to generate a CheetSheet.')
-
+    if key is None:
+        key = random.choice(tuple(NotesInt))
     special_cases = [14 in struc.value for struc in structures]  
-    return CheetSheet(info=path_nodes, structures=structures, special_cases=special_cases, bases=bases, key=key) # type: ignore Handled via try block
+    return CheetSheet(info=path_nodes, structures=structures, special_cases=special_cases, bases=bases, key=key)
 
 def construct_progression(performance: PerformanceResponse) -> ProgressionFields:
     nodes = tuple(performance.nodes)
