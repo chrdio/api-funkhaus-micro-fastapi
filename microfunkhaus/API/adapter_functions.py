@@ -75,20 +75,20 @@ def construct_cheet_sheet(performance: Union[PerformanceResponse, Performance], 
         structures = progression.structures
         bases = [node.base for node in progression.nodes]
         node_names = tuple(node.node_id for node in progression.nodes)
-        structure_names = tuple(
-            ChordSymbolStructures[ChordIntervalStructures(structure).name]
+        converted_structures = tuple(
+            ChordSymbolStructures[structure.name]
             for structure in progression.structures
         )
     else:
         try:
             bases = [node.base for node in performance.nodes]  # type: ignore
-            structures = [ChordIntervalStructures[struc] for struc in performance.structures] # type: ignore
+            structures = [ChordIntervalStructures[struc.name] for struc in performance.structures] # type: ignore
             node_names = [node.node_id for node in performance.nodes] # type: ignore
-            structure_names = tuple(x for x in performance.structures) # type: ignore
+            converted_structures = tuple(x for x in performance.structures) # type: ignore
         except AttributeError:
             raise ValueError('Not enough data to generate a CheetSheet.')
     
-    path_nodes = list(zip(node_names, structure_names))
+    path_nodes = list(zip(node_names, converted_structures))
     try:
         key = performance.key
     except AttributeError:
