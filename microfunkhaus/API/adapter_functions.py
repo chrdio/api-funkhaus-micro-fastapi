@@ -107,14 +107,14 @@ def construct_progression(performance: PerformanceResponse) -> ProgressionFields
     return ProgressionFields(graph=performance.graph, nodes=nodes, structures=structures, changeabilities=performance.changeabilities)
 
 def construct_performance(*, progression: ProgressionFields, cheet_sheet: CheetSheet, pseudo_midi: PseudoMIDI, hex_blob: str) -> PerformanceResponse:
-    structure_names = [ChordSymbolStructures(ChordIntervalStructures(structure).name) for structure in progression.structures]
+    symbol_structures = [ChordSymbolStructures[structure.name] for structure in progression.structures]
     performance = PerformanceResponse(
         graph=progression.graph,
         key=cheet_sheet.key,
         nodes=progression.nodes,
         hex_blob=hex_blob,
         human_readable=list(list()), # Handled by validation
-        structures=structure_names,
+        structures=symbol_structures,
         ticket=pseudo_midi.ticket,
         changeabilities=progression.changeabilities,
         )
