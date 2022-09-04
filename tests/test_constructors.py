@@ -5,7 +5,7 @@ from microfunkhaus import API, actions
 from hypothesis import given, strategies as st, HealthCheck, settings
 from chrdiotypes.musical import ProgressionFields, ProgressionRequest, CheetSheet, ProgressionFields, PseudoMIDI, NodeFields
 from chrdiotypes.transport import PathTransport, SessionTransport, UserTransport, LabelTransport, GenericUser
-from chrdiotypes.data_enums import ChordSymbolStructures, NotesInt, NodeIDs
+from chrdiotypes.data_enums import ChordSymbolStructures, ChordIntervalStructures, NotesInt, NodeIDs
 from .raw import raw_performance, raw_cheetsheet
 
 
@@ -43,12 +43,11 @@ def test_construct_progression_request(perf_response):
 
 @settings(suppress_health_check=[HealthCheck(9)])
 @given(
-    progression=st.one_of(
-        st.builds(API.Performance),
+    progression=
         st.builds(
-            API.PerformanceResponse,
+            ProgressionFields,
             structures=st.lists(
-                st.sampled_from(tuple(ChordSymbolStructures)),
+                st.sampled_from(tuple(ChordIntervalStructures)),
                 min_size=4,
                 max_size=4,
                 ),
@@ -65,7 +64,6 @@ def test_construct_progression_request(perf_response):
                 min_size=4,
                 max_size=4,
             )
-        )
         )
     )
 def test_construct_cheet_sheet(progression, perf_response):
