@@ -108,7 +108,7 @@ def construct_progression(performance: PerformanceResponse) -> ProgressionFields
 
 def construct_performance(*, progression: ProgressionFields, cheet_sheet: CheetSheet, pseudo_midi: PseudoMIDI, hex_blob: str) -> PerformanceResponse:
     symbol_structures = [ChordSymbolStructures[structure.name] for structure in progression.structures]
-    performance = PerformanceResponse(
+    performance = PerformanceResponse.construct(
         graph=progression.graph,
         key=cheet_sheet.key,
         nodes=progression.nodes,

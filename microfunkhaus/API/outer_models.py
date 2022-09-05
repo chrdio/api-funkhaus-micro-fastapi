@@ -168,12 +168,12 @@ class PerformanceResponse(BaseModel):
         
             names_and_types = [(
                     NotesSym[NotesInt((node.base + values["key"])%12).name].value,
-                    ChordTypes(node.node_id[-1]).name.lower()
+                    ChordTypes(node.node_id.value[-1]).name.lower()
                     )
                 for node in values["nodes"]
                 ]
             flavors = [
-                StructureValues[StructureSymbols(structure[-1]).name].value
+                StructureValues[StructureSymbols(structure.value[-1]).name].value
                 for structure in values["structures"]
             ]
             values["human_readable"] = list(zip(*zip(*names_and_types), flavors))
