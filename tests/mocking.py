@@ -1,5 +1,6 @@
 from pytest import fixture
 from pydantic import EmailStr
+from ipaddress import IPv4Address
 from hypothesis import strategies as st
 from chrdiotypes.musical import (
 	ProgressionFields,
@@ -105,6 +106,21 @@ b_perf_response = st.builds(
 		min_size=LENGTH,
 		max_size=LENGTH,
 	),
+)
+b_performance=st.builds(
+	API.Performance,
+	user_object=b_user_obj,
+	sess_id=st.ip_addresses(v=4)
+)
+b_perf_request = st.builds(
+	API.PerformanceRequest,
+	user=b_user_obj,
+	performance_object=st.one_of(b_perf_response, b_performance)
+)
+b_amend_request = st.builds(
+	API.AmendmentRequest,
+	user=b_user_obj,
+	performance_object=b_perf_response
 )
 
 raw_performance = """{
