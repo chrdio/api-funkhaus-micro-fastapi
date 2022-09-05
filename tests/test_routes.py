@@ -6,6 +6,15 @@ from .mocking import b_perf_request, b_generic_request, b_labeling_request,LENGT
 APP=generate_app_with_config(testing=True)
 TEST_APP = TestClient(APP)
 headers = {"X-Token": "testing"}
+invalid_headers = {"X-Token": "invalid"}
+
+
+
+def test_healthcheck():
+    assert TEST_APP.get("/healthcheck", headers=headers).ok
+
+def test_wrong_header():
+    assert not TEST_APP.get("/healthcheck", headers=invalid_headers).ok
 
 @given(b_perf_request)
 def test_generation(r):
@@ -18,9 +27,6 @@ def test_labeling(r):
     payload = r.json()
     response = TEST_APP.post("/label", payload, headers=headers)
     assert response.ok
-
-def test_healthcheck():
-    assert TEST_APP.get("/healthcheck", headers=headers).ok
 
 @given(b_generic_request, st.integers(min_value=0, max_value=LENGTH-1))
 def test_amend_idiomatic_performance(r, ind):
@@ -35,5 +41,3 @@ def test_amend_idiomatic_performance(r, ind):
     am_payload = amendment_req.json()
     response = TEST_APP.post(f"/amend/{ind}", am_payload, headers=headers)
     assert response.ok
-
-    

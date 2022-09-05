@@ -53,9 +53,10 @@ def get_req_ensure_label(label: LabelTransport) -> Tuple[Endpoint, LabelTranspor
     endpoint = ENDPOINTS["microaccountant/data"]
     return (endpoint, label)
 
-def get_req_user_creation(request: SessionTransport) -> Tuple[Endpoint, SessionTransport]:
-    endpoint = ENDPOINTS["microaccountant/createuser"]
-    return (endpoint, request)
+# A legacy endpoint
+# def get_req_user_creation(request: SessionTransport) -> Tuple[Endpoint, SessionTransport]:
+#     endpoint = ENDPOINTS["microaccountant/createuser"]
+#     return (endpoint, request)
 
 ENSUREMENT_REQUEST_METHODS = {
     SessionTransport: get_req_ensure_session,

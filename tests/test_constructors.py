@@ -1,5 +1,6 @@
 
 import devtools
+import pytest
 from ipaddress import IPv4Address
 from microfunkhaus import API, actions
 from hypothesis import given, strategies as st, HealthCheck, settings
@@ -12,7 +13,8 @@ from .mocking import (
     b_progression_fields,
     b_generic_request,
     b_labeling_request,
-    b_perf_response
+    b_perf_response,
+    b_user_obj
 )
 
 
@@ -26,9 +28,14 @@ def test_construct_path_data(progression):
 def test_construct_voicing_data(progression, cheetsheet, pseudomidi):
     assert API.construct_voicing_data(progression, cheetsheet, pseudomidi)
 
-@given(b_generic_request)
+@given(st.builds(API.GenericRequest, user_object=b_user_obj, sess_id=st.ip_addresses(v=4)))
 def test_construct_user_data(r):
     assert API.construct_user_data(r)
+
+@given(st.builds(API.GenericRequest, user_object=st.none(), sess_id=st.ip_addresses(v=4)))
+def test_construct_user_data_fails(r):
+    with pytest.raises(ValueError):
+        API.construct_user_data(r)
 
 @given(b_generic_request)
 def test_construct_session_data(r):
@@ -43,9 +50,17 @@ def test_construct_progression_request(pr):
     assert API.construct_progression_request(pr)
 
 @given(progression=b_progression_fields, pr=b_perf_response)
-def test_construct_cheet_sheet(progression, pr):
+def test_construct_cheet_sheet_w_progression(progression, pr):
     assert API.construct_cheet_sheet(pr, progression=progression)
 
+@given(progression=st.none(), pr=b_perf_response)
+def test_construct_cheet_sheet_wo_progression(progression, pr):
+    assert API.construct_cheet_sheet(pr, progression=progression)
+
+@given(progression=st.none(), pr=st.builds(API.Performance))
+def test_construct_cheet_sheet_wo_progression_fails(progression, pr):
+    with pytest.raises(ValueError):
+        API.construct_cheet_sheet(pr, progression=progression)
 
 @given(b_perf_response)
 def test_construct_performance_through(pr):

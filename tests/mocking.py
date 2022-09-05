@@ -58,19 +58,23 @@ b_pseudomidi = st.builds(
 	),
 	ticket=st.text("0123456789-", min_size=7, max_size=40)
 )
-b_user_obj = st.builds(
+b_user_obj=st.builds(
 	API.User,
 	email=st.from_type(EmailStr)
 	)
+b_user_obj_opt = st.one_of(
+	b_user_obj,
+	st.none()
+)
 b_labeling_request = st.builds(
 	API.LabelingRequest,
-	user_object=b_user_obj,
+	user_object=b_user_obj_opt,
 	sess_id=st.ip_addresses(v=4),
 	flag=st.sampled_from(tuple(PerformanceFlags))
 	)
 b_generic_request = st.builds(
 	API.GenericRequest,
-	user_object=b_user_obj,
+	user_object=b_user_obj_opt,
 	sess_id=st.ip_addresses(v=4)
 	)
 b_node_fields = st.builds(
@@ -109,17 +113,17 @@ b_perf_response = st.builds(
 )
 b_performance=st.builds(
 	API.Performance,
-	user_object=b_user_obj,
+	user_object=b_user_obj_opt,
 	sess_id=st.ip_addresses(v=4)
 )
 b_perf_request = st.builds(
 	API.PerformanceRequest,
-	user=b_user_obj,
+	user=b_user_obj_opt,
 	performance_object=st.one_of(b_perf_response, b_performance)
 )
 b_amend_request = st.builds(
 	API.AmendmentRequest,
-	user=b_user_obj,
+	user=b_user_obj_opt,
 	performance_object=b_perf_response
 )
 

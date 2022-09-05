@@ -8,7 +8,7 @@ from ..API import (
     get_req_progression_generation,
     get_req_progression_amendment,
     get_req_voices_generation,
-    get_req_user_creation,
+    # get_req_user_creation,
     submit_data_tasks,
     PerformanceRequest,
     AmendmentRequest,
@@ -75,7 +75,7 @@ async def generate_progression(full_request: PerformanceRequest) -> PerformanceR
 
     try:
         await asyncio.gather(*task_chest)
-    except ClientResponseError as e:
+    except ClientResponseError as e: # pragma: no cover (no way to test remotely)
         logger_generator.warning(f"Request failed: {e.status} {e.message}")
         raise
     await local_session.close()
@@ -116,7 +116,7 @@ async def amend_progression(full_request: AmendmentRequest, index: int) -> Perfo
 
     try:
         await asyncio.gather(*task_chest)
-    except ClientResponseError as e:
+    except ClientResponseError as e: # pragma: no cover (no way to test remotely)
         logger_generator.warning(f"Request failed: {e.status} {e.message}")
         raise
     await local_session.close()
@@ -143,16 +143,17 @@ async def send_labels(labeling_request: LabelingRequest) -> bool:
     await local_session.close()
     return True
 
-async def create_user(userinit_request: GenericRequest) -> GenericRequest:
-    local_session = ClientSession()
+# A legacy endpoint
+# async def create_user(userinit_request: GenericRequest) -> GenericRequest:
+#     local_session = ClientSession()
 
-    session_data = construct_session_data(userinit_request)
-    user_request = get_req_user_creation(session_data)
-    user_raw = await post_single_request(*user_request, session=local_session)
-    user_obj = GenericRequest.parse_raw(user_raw)
+#     session_data = construct_session_data(userinit_request)
+#     user_request = get_req_user_creation(session_data)
+#     user_raw = await post_single_request(*user_request, session=local_session)
+#     user_obj = GenericRequest.parse_raw(user_raw)
     
-    await local_session.close()
-    return user_obj
+#     await local_session.close()
+#     return user_obj
 
 async def healthcheck_dependencies(deps: Sequence[Endpoint]):
     session = ClientSession()

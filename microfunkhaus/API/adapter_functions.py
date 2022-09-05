@@ -89,10 +89,7 @@ def construct_cheet_sheet(performance: Union[PerformanceResponse, Performance], 
             raise ValueError('Not enough data to generate a CheetSheet.')
     
     path_nodes = list(zip(node_names, converted_structures))
-    try:
-        key = performance.key
-    except AttributeError:
-        raise ValueError('Not enough data to generate a CheetSheet.')
+    key = performance.key
     if key is None:
         key = random.choice(tuple(NotesInt))
     special_cases = [14 in struc.value for struc in structures]  

@@ -68,12 +68,12 @@ def generate_app_with_config(testing: bool = False):
     def get_real_ip(request: Request) -> Optional[IPv4Address]:
         try:
         # TestClient supplies an invalid
-        # adress 'testclient' in requests
+        # address 'testclient' in requests
             client_address = request.client
             if client_address:
                 return IPv4Address(client_address.host)
             else:
-                return None
+                return None # pragma: no cover (no way to test for now)
         except AddressValueError:
             return IPv4Address('255.255.255.255')
 
@@ -109,7 +109,7 @@ def generate_app_with_config(testing: bool = False):
         performance.sess_id = real_ip
         try:
             responses = await generate_progression(performance)
-        except ClientResponseError as e:
+        except ClientResponseError as e: # pragma: no cover (no way to test for now)
             raise HTTPException(status_code=e.status, detail=e.message)
         return responses
 
@@ -137,7 +137,7 @@ def generate_app_with_config(testing: bool = False):
         full_request.sess_id = real_ip
         try:
             responses = await amend_progression(full_request, index)
-        except ClientResponseError as e:
+        except ClientResponseError as e: # pragma: no cover (no way to test for now)
             raise HTTPException(status_code=e.status, detail=e.message)
         return responses
 
@@ -150,13 +150,17 @@ def generate_app_with_config(testing: bool = False):
         labeling_request.sess_id = real_ip
         try:
             await send_labels(labeling_request)
-        except ClientResponseError as e:
+        except ClientResponseError as e: # pragma: no cover (no way to test for now)
             raise HTTPException(status_code=e.status, detail=e.message)
         return Response(status_code=201)
 
     @app.get("/healthcheck")
     async def healthcheck():
-        return Response(status_code=200)
+        try:
+            ok = await healthcheck_dependencies(HEALTHPOINTS)
+            return Response(status_code=200)
+        except ClientConnectionError as e: # pragma: no cover (no way to test for now)
+            raise HTTPException(status_code=429, detail="Not all remotes are healthy.")
 
     return app
 
