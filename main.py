@@ -9,6 +9,7 @@ with open("config.json", "r") as config_file:
     CERTFILE = config["certfile"]
 
 from microfunkhaus import APP
+
 if __name__ == "__main__":
     uvicorn.run(
         "main:APP",
@@ -18,4 +19,4 @@ if __name__ == "__main__":
         reload=True,
         ssl_keyfile=KEYFILE,
         ssl_certfile=CERTFILE,
-        )
+    )

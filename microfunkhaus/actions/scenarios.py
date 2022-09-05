@@ -28,13 +28,15 @@ from ..API import (
 from ..logsetup import get_logger
 
 logger_generator = get_logger("generate_performance")
+
+
 async def generate_progression(full_request: PerformanceRequest) -> PerformanceResponse:
     local_session = ClientSession()
     task_chest = set()
     performance = full_request.performance_object
-    
+
     perf_name = performance.__class__.__name__
-    
+
     if full_request.user_object is not None:
         data_type = "user"
         session_data = construct_user_data(full_request)
@@ -47,10 +49,12 @@ async def generate_progression(full_request: PerformanceRequest) -> PerformanceR
 
     # Alternative if statement somehow breaks the code, hence the try/except
     try:
-        progression = construct_progression(performance) # type: ignore PerformanceResponse
+        progression = construct_progression(performance)  # type: ignore PerformanceResponse
         logger_generator.info(f"Parsed a progression from {perf_name}")
     except AttributeError:
-        logger_generator.info(f"Can't parse a progression from {perf_name}: requesting a new one")
+        logger_generator.info(
+            f"Can't parse a progression from {perf_name}: requesting a new one"
+        )
         req_prog = get_req_progression_generation(performance)
         progression_raw = await post_single_request(*req_prog, session=local_session)
         progression = ProgressionFields.parse_raw(progression_raw)
@@ -58,8 +62,8 @@ async def generate_progression(full_request: PerformanceRequest) -> PerformanceR
     req_voice = get_req_voices_generation(performance, progression=progression)
     voices_raw = await post_single_request(*req_voice, session=local_session)
     voices = PseudoMIDI.parse_raw(voices_raw)
-    cheetsheet = req_voice[1] 
-    
+    cheetsheet = req_voice[1]
+
     req_midihex = get_req_midihex_generation(voices)
     midihex_raw = await post_single_request(*req_midihex, session=local_session)
     midihex = json.loads(midihex_raw)
@@ -69,13 +73,13 @@ async def generate_progression(full_request: PerformanceRequest) -> PerformanceR
         progression=progression,
         cheet_sheet=cheetsheet,
         hex_blob=midihex,
-        pseudo_midi=voices
+        pseudo_midi=voices,
     )
     logger_generator.info(f"Constructed a new performance.")
 
     try:
         await asyncio.gather(*task_chest)
-    except ClientResponseError as e: # pragma: no cover (no way to test remotely)
+    except ClientResponseError as e:  # pragma: no cover (no way to test remotely)
         logger_generator.warning(f"Request failed: {e.status} {e.message}")
         raise
     await local_session.close()
@@ -83,7 +87,10 @@ async def generate_progression(full_request: PerformanceRequest) -> PerformanceR
     del task_chest
     return outcoming_performance
 
-async def amend_progression(full_request: AmendmentRequest, index: int) -> PerformanceResponse:
+
+async def amend_progression(
+    full_request: AmendmentRequest, index: int
+) -> PerformanceResponse:
     old_performance = full_request.performance_object
     local_session = ClientSession()
     task_chest = set()
@@ -93,11 +100,13 @@ async def amend_progression(full_request: AmendmentRequest, index: int) -> Perfo
     else:
         session_data = construct_session_data(full_request)
     submit_data_tasks(session_data, storage=task_chest, session=local_session)
-    
+
     req_amend_progression = get_req_progression_amendment(old_performance, index)
-    new_progression_raw = await post_single_request(*req_amend_progression, session=local_session)
+    new_progression_raw = await post_single_request(
+        *req_amend_progression, session=local_session
+    )
     new_progression = ProgressionFields.parse_raw(new_progression_raw)
-    
+
     req_voice = get_req_voices_generation(old_performance, progression=new_progression)
     voices_raw = await post_single_request(*req_voice, session=local_session)
     voices = PseudoMIDI.parse_raw(voices_raw)
@@ -111,12 +120,12 @@ async def amend_progression(full_request: AmendmentRequest, index: int) -> Perfo
         progression=new_progression,
         cheet_sheet=cheetsheet,
         hex_blob=midihex,
-        pseudo_midi=voices
+        pseudo_midi=voices,
     )
 
     try:
         await asyncio.gather(*task_chest)
-    except ClientResponseError as e: # pragma: no cover (no way to test remotely)
+    except ClientResponseError as e:  # pragma: no cover (no way to test remotely)
         logger_generator.warning(f"Request failed: {e.status} {e.message}")
         raise
     await local_session.close()
@@ -137,11 +146,11 @@ async def send_labels(labeling_request: LabelingRequest) -> bool:
     label_data = construct_label_data(labeling_request)
     submit_data_tasks(label_data, storage=task_chest, session=local_session)
 
-
     await asyncio.gather(*task_chest)
     del task_chest
     await local_session.close()
     return True
+
 
 # A legacy endpoint
 # async def create_user(userinit_request: GenericRequest) -> GenericRequest:
@@ -151,14 +160,13 @@ async def send_labels(labeling_request: LabelingRequest) -> bool:
 #     user_request = get_req_user_creation(session_data)
 #     user_raw = await post_single_request(*user_request, session=local_session)
 #     user_obj = GenericRequest.parse_raw(user_raw)
-    
+
 #     await local_session.close()
 #     return user_obj
+
 
 async def healthcheck_dependencies(deps: Sequence[Endpoint]):
     session = ClientSession()
     async with session:
-        oks = await asyncio.gather(
-            *(ping_dependency(e, session=session) for e in deps)
-        )
+        oks = await asyncio.gather(*(ping_dependency(e, session=session) for e in deps))
     return all(oks)

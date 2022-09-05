@@ -7,7 +7,7 @@ from .adapter_functions import (
     construct_performance,
     construct_progression,
     construct_path_data,
-    construct_voicing_data
+    construct_voicing_data,
 )
 from .outer_models import (
     Performance,
@@ -24,11 +24,7 @@ from .engine import (
     instant_fire_coroutines,
     ping_dependency,
 )
-from .endpoints import (
-    Endpoint,
-    ENDPOINTS,
-    HEALTHPOINTS
-)
+from .endpoints import Endpoint, ENDPOINTS, HEALTHPOINTS
 from .requests import (
     get_req_progression_amendment,
     get_req_progression_generation,
