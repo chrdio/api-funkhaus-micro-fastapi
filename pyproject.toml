@@ -10,7 +10,8 @@ fastapi = "^0.81"
 aiohttp = "^3.8.1"
 uvicorn = "^0.18.2"
 email-validator = "^1.2.1"
-chrdiotypes = {path = "../chrdiotypes/dist/chrdiotypes-0.1.3-py3-none-any.whl"}
+chrdiotypes = {git = "git@github.com:chrdio/chrdiotypes.git", rev = "main"}
+
 
 [tool.poetry.dev-dependencies]
 black = "^22.6.0"
