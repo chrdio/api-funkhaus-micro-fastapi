@@ -3,7 +3,7 @@ from microfunkhaus import generate_app_with_config, API
 from fastapi.testclient import TestClient
 from .mocking import b_perf_request, b_generic_request, b_labeling_request, LENGTH
 
-APP = generate_app_with_config(testing=True)
+APP = generate_app_with_config()
 TEST_APP = TestClient(APP)
 headers = {"X-Token": "testing"}
 invalid_headers = {"X-Token": "invalid"}
