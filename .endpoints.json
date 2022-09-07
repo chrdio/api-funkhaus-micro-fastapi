@@ -1,0 +1,52 @@
+[
+  {
+    "name": "micropathforger/generate",
+    "host": "127.0.0.1",
+    "port": "8001",
+    "path": "generate",
+    "option": "4"
+  },
+  {
+    "name": "micropathforger/amend",
+    "host": "127.0.0.1",
+    "port": "8001",
+    "path": "amend"
+  },
+  {
+    "name": "microvoicemaster/perform",
+    "host": "127.0.0.1",
+    "port": "8002",
+    "path": "perform"
+  },
+  {
+    "name": "microbureaucrat/savemidi",
+    "host": "127.0.0.1",
+    "port": "8003",
+    "path": "savefile",
+    "option": "mid"
+  },
+  {
+    "name": "microaccountant/music",
+    "host": "127.0.0.1",
+    "port": "8004",
+    "path": "ensure/music"
+  },
+  {
+    "name": "microaccountant/people",
+    "host": "127.0.0.1",
+    "port": "8004",
+    "path": "ensure/session"
+  },
+  {
+    "name": "microaccountant/createuser",
+    "host": "127.0.0.1",
+    "port": "8004",
+    "path": "create/user"
+  },
+  {
+    "name": "microaccountant/data",
+    "host": "127.0.0.1",
+    "port": "8004",
+    "path": "gather/label"
+  }
+]
