@@ -1,0 +1,1 @@
+[![Tests](https://github.com/chrdio/api-funkhaus-micro-fastapi/actions/workflows/ci.yml/badge.svg)](https://github.com/chrdio/api-funkhaus-micro-fastapi/actions/workflows/ci.yml)
