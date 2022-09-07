@@ -2,7 +2,7 @@ import json
 import time
 from ipaddress import IPv4Address, AddressValueError
 from turtle import title
-from typing import Optional
+from typing import Optional, Set
 from fastapi import (
     FastAPI,
     Response,
@@ -30,21 +30,17 @@ from .actions import (
 )
 
 
-def generate_app_with_config(testing: bool = False):
-    if testing:
-        TOKENS = {
-            "testing",
-        }
-    else:
-        with open(".tokens.json", "r") as token_file:
-            TOKENS = set(json.load(token_file))
+def generate_app_with_config(
+    tokens: Set[str] = {"testing",},
+    remote_healthcheck_on_startup: bool = True
+    ):
 
     with open("config.json", "r") as config_file:
         config = json.load(config_file)
         TITLE = config["title"]
 
     async def check_token(x_token: str = Header()):
-        if x_token not in TOKENS:
+        if x_token not in tokens:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token"
             )
@@ -83,19 +79,20 @@ def generate_app_with_config(testing: bool = False):
         except AddressValueError:
             return IPv4Address("255.255.255.255")
 
-    @app.on_event("startup")
-    async def startup_event():  # pragma: no cover
-        ok = False
-        try:
-            ok = await healthcheck_dependencies(HEALTHPOINTS)
-        finally:
-            # This awkward if statement is here
-            # so you don't need to re-raise
-            # the exception in case of failure
-            if not ok:
-                print("Could not establish connections to all of the microservices.")
-            else:
-                print("Connections to all of the microservices are established.")
+    if remote_healthcheck_on_startup:
+        @app.on_event("startup")
+        async def startup_event():  # pragma: no cover
+            ok = False
+            try:
+                ok = await healthcheck_dependencies(HEALTHPOINTS)
+            finally:
+                # This awkward if statement is here
+                # so you don't need to re-raise
+                # the exception in case of failure
+                if not ok:
+                    print("Could not establish connections to all of the microservices.")
+                else:
+                    print("Connections to all of the microservices are established.")
 
     generation_description = """You can specify the optional key and mode (graph) parameters,
     or even supply the otherwise verbatim progression with a changed key to transpose it."""
@@ -168,6 +165,3 @@ def generate_app_with_config(testing: bool = False):
             raise HTTPException(status_code=429, detail="Not all remotes are healthy.")
 
     return app
-
-
-app = generate_app_with_config()
