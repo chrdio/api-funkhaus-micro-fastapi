@@ -111,7 +111,7 @@ def construct_cheet_sheet(
     key = performance.key
     if key is None:
         key = random.choice(tuple(NotesInt))
-    special_cases = [14 in struc.value for struc in structures]
+    special_cases = [struc.value[1] for struc in structures]
     return CheetSheet(
         info=path_nodes,
         structures=structures,
