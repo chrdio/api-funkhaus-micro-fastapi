@@ -8,7 +8,6 @@ from ..API import (
     get_req_progression_generation,
     get_req_progression_amendment,
     get_req_voices_generation,
-    # get_req_user_creation,
     submit_data_tasks,
     PerformanceRequest,
     AmendmentRequest,
@@ -22,29 +21,37 @@ from ..API import (
     post_single_request,
     get_req_midihex_generation,
     ping_dependency,
-    GenericRequest,
     Endpoint,
 )
 
 
 
 async def generate_progression(full_request: PerformanceRequest) -> PerformanceResponse:
-    local_session = ClientSession()
+    """Makes calls to
+    the 'micropathforger',
+    the 'microvoicemaster' &
+    the 'microbureaucrat' services
+    to generate a chord progression
+    and create its performance.
+     
+    Sends user data to the 'microaccountant'.
+    """
+
+    # Define a set instead of a variable
+    # in case there will be more requests
+    # of this type
     task_chest = set()
+    local_session = ClientSession()
     performance = full_request.performance_object
 
-    perf_name = performance.__class__.__name__
-
+    # Send user data
     if full_request.user_object is not None:
-        data_type = "user"
         session_data = construct_user_data(full_request)
     else:
-        data_type = "session"
         session_data = construct_session_data(full_request)
     submit_data_tasks(session_data, storage=task_chest, session=local_session)
-    # ensured_session.add_done_callback(task_chest.discard)
 
-    # Alternative if statement somehow breaks the code, hence the try/except
+    # Either generates or parses a chord progression.
     try:
         progression = construct_progression(performance)  # type: ignore PerformanceResponse
     except AttributeError:
@@ -52,15 +59,18 @@ async def generate_progression(full_request: PerformanceRequest) -> PerformanceR
         progression_raw = await post_single_request(*req_prog, session=local_session)
         progression = ProgressionFields.parse_raw(progression_raw)
 
+    # Generates voices
     req_voice = get_req_voices_generation(performance, progression=progression)
     voices_raw = await post_single_request(*req_voice, session=local_session)
     voices = PseudoMIDI.parse_raw(voices_raw)
     cheetsheet = req_voice[1]
 
+    # Generate a midifile
     req_midihex = get_req_midihex_generation(voices)
     midihex_raw = await post_single_request(*req_midihex, session=local_session)
     midihex = json.loads(midihex_raw)
 
+    # Assembles a performance
     outcoming_performance = construct_performance(
         progression=progression,
         cheet_sheet=cheetsheet,
@@ -68,43 +78,63 @@ async def generate_progression(full_request: PerformanceRequest) -> PerformanceR
         pseudo_midi=voices,
     )
 
+    # Deals with background processes
     try:
         await asyncio.gather(*task_chest)
     except ClientResponseError as e:  # pragma: no cover (no way to test remotely)
         raise
     await local_session.close()
     del task_chest
+
     return outcoming_performance
 
 
 async def amend_progression(
     full_request: AmendmentRequest, index: int
-) -> PerformanceResponse:
+    ) -> PerformanceResponse:
+    """Makes calls to
+    the 'micropathforger',
+    the 'microvoicemaster' &
+    the 'microbureaucrat' services
+    to amend a chord progression
+    and create its performance.
+     
+    Sends user data to the 'microaccountant'.
+    """
+
+    # Define a set instead of a variable
+    # in case there will be more requests
+    # of this type
+    task_chest = set()
     old_performance = full_request.performance_object
     local_session = ClientSession()
-    task_chest = set()
 
+    # Send user data
     if full_request.user_object is not None:
         session_data = construct_user_data(full_request)
     else:
         session_data = construct_session_data(full_request)
     submit_data_tasks(session_data, storage=task_chest, session=local_session)
 
+    # Generates an amended progression.
     req_amend_progression = get_req_progression_amendment(old_performance, index)
     new_progression_raw = await post_single_request(
         *req_amend_progression, session=local_session
     )
     new_progression = ProgressionFields.parse_raw(new_progression_raw)
 
+    # Generates voices
     req_voice = get_req_voices_generation(old_performance, progression=new_progression)
     voices_raw = await post_single_request(*req_voice, session=local_session)
     voices = PseudoMIDI.parse_raw(voices_raw)
     cheetsheet = req_voice[1]
 
+    # Generates a midifile
     req_midihex = get_req_midihex_generation(voices)
     midihex_raw = await post_single_request(*req_midihex, session=local_session)
     midihex = json.loads(midihex_raw)
 
+    # Assembles a performance
     outcoming_performance = construct_performance(
         progression=new_progression,
         cheet_sheet=cheetsheet,
@@ -112,6 +142,7 @@ async def amend_progression(
         pseudo_midi=voices,
     )
 
+    # Deals with background processes
     try:
         await asyncio.gather(*task_chest)
     except ClientResponseError as e:  # pragma: no cover (no way to test remotely)
@@ -122,8 +153,13 @@ async def amend_progression(
 
 
 async def send_labels(labeling_request: LabelingRequest) -> bool:
-    local_session = ClientSession()
+    """Notifies the 'microaccountant' about the user and a new label"""
+    
+    # Define a set instead of a variable
+    # in case there will be more requests
+    # of this type
     task_chest = set()
+    local_session = ClientSession()
 
     if labeling_request.user_object is not None:
         session_data = construct_user_data(labeling_request)
@@ -139,20 +175,9 @@ async def send_labels(labeling_request: LabelingRequest) -> bool:
     return True
 
 
-# A legacy endpoint
-# async def create_user(userinit_request: GenericRequest) -> GenericRequest:
-#     local_session = ClientSession()
+async def healthcheck_dependencies(deps: Sequence[Endpoint]) -> bool:
+    """Checks if all services are online"""
 
-#     session_data = construct_session_data(userinit_request)
-#     user_request = get_req_user_creation(session_data)
-#     user_raw = await post_single_request(*user_request, session=local_session)
-#     user_obj = GenericRequest.parse_raw(user_raw)
-
-#     await local_session.close()
-#     return user_obj
-
-
-async def healthcheck_dependencies(deps: Sequence[Endpoint]):
     session = ClientSession()
     async with session:
         oks = await asyncio.gather(*(ping_dependency(e, session=session) for e in deps))
