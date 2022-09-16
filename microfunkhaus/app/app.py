@@ -33,12 +33,15 @@ def generate_app_with_config(
     tokens: Set[str] = {"testing",},
     remote_healthcheck_on_startup: bool = True
     ):
+    """Injects configuration on app creation."""
 
     with open("config.json", "r") as config_file:
         config = json.load(config_file)
         TITLE = config["title"]
 
     async def check_token(x_token: str = Header()):
+        """Checks headers on each request, returns HTTP401 if token isn't recognized."""
+
         if x_token not in tokens:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token"
@@ -49,6 +52,7 @@ def generate_app_with_config(
         docs_url="/",
         dependencies=[Depends(check_token)],
     )
+
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["*"],
@@ -59,6 +63,8 @@ def generate_app_with_config(
 
     @app.middleware("http")
     async def add_process_time(request: Request, call_next):
+        """Spits out the processing time for every request."""
+
         start_time = time.time()
         response = await call_next(request)
         process_time = round((time.time() - start_time) * 10**6)
@@ -67,15 +73,17 @@ def generate_app_with_config(
 
     # Dependency
     def get_real_ip(request: Request) -> Optional[IPv4Address]:
+        """Swaps the GenericRequest.sess_id for a real ip adress of the request."""
+
         try:
-            # TestClient supplies an invalid
-            # address 'testclient' in requests
             client_address = request.client
             if client_address:
                 return IPv4Address(client_address.host)
             else:
                 return None  # pragma: no cover (no way to test for now)
         except AddressValueError:
+            # TestClient supplies an invalid
+            # address 'testclient' in requests
             return IPv4Address("255.255.255.255")
 
     if remote_healthcheck_on_startup:
@@ -92,6 +100,8 @@ def generate_app_with_config(
                     print("Could not establish connections to all of the microservices.")
                 else:
                     print("Connections to all of the microservices are established.")
+    else:
+        pass
 
     generation_description = """You can specify the optional key and mode (graph) parameters,
     or even supply the otherwise verbatim progression with a changed key to transpose it."""
@@ -107,7 +117,9 @@ def generate_app_with_config(
     async def gen_progression(
         performance: PerformanceRequest,
         real_ip=Depends(get_real_ip),
-    ):
+        ) -> PerformanceResponse:
+        """Generates a performance according to options provided in request."""
+
         performance.sess_id = real_ip
         try:
             responses = await generate_progression(performance)
@@ -135,7 +147,9 @@ def generate_app_with_config(
             example=1,
         ),
         real_ip=Depends(get_real_ip),
-    ):
+        ) -> PerformanceResponse:
+        """Changes a performance according to options provided in request."""
+        
         full_request.sess_id = real_ip
         try:
             responses = await amend_progression(full_request, index)
@@ -147,7 +161,9 @@ def generate_app_with_config(
     async def label_progression(
         labeling_request: LabelingRequest,
         real_ip=Depends(get_real_ip),
-    ):
+        ):
+        """Sends labels to the remote database."""
+
         labeling_request.sess_id = real_ip
         try:
             await send_labels(labeling_request)
@@ -157,6 +173,10 @@ def generate_app_with_config(
 
     @app.get("/healthcheck")
     async def healthcheck():
+        """Checks if remote endpoints are online.
+        Self-check is implied.
+        """
+
         try:
             ok = await healthcheck_dependencies(HEALTHPOINTS)
             return Response(status_code=200)
