@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "microfunkhaus"
-version = "0.1.1"
+version = "1.0.0"
 description = "A facade/gateway microservice to rule them all."
 authors = ["Arthur Ryzhak <ryzhakar@gmail.com>"]
 
