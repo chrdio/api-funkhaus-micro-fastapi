@@ -20,7 +20,7 @@ try:
 except:
     raise ValueError("Please, provide valid JSON-encoded tokens.")
 
-APP = generate_app_with_config(tokens=valid_tokens.__root__, remote_healthcheck_on_startup=False)
+APP = generate_app_with_config(tokens=valid_tokens.__root__, remote_healthcheck_on_startup=True)
 
 if __name__ == "__main__":
     uvicorn.run(

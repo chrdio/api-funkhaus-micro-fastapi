@@ -1,7 +1,6 @@
 import json
 import time
 from ipaddress import IPv4Address, AddressValueError
-from turtle import title
 from typing import Optional, Set
 from fastapi import (
     FastAPI,
@@ -15,14 +14,14 @@ from fastapi import (
 )
 from aiohttp import ClientResponseError, ClientConnectionError
 from fastapi.middleware.cors import CORSMiddleware
-from .API import (
+from ..API import (
     PerformanceRequest,
     LabelingRequest,
     AmendmentRequest,
     PerformanceResponse,
     HEALTHPOINTS,
 )
-from .actions import (
+from ..actions import (
     generate_progression,
     send_labels,
     amend_progression,

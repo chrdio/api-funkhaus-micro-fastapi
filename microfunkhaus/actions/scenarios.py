@@ -25,9 +25,7 @@ from ..API import (
     GenericRequest,
     Endpoint,
 )
-from ..logsetup import get_logger
 
-logger_generator = get_logger("generate_performance")
 
 
 async def generate_progression(full_request: PerformanceRequest) -> PerformanceResponse:
@@ -45,16 +43,11 @@ async def generate_progression(full_request: PerformanceRequest) -> PerformanceR
         session_data = construct_session_data(full_request)
     submit_data_tasks(session_data, storage=task_chest, session=local_session)
     # ensured_session.add_done_callback(task_chest.discard)
-    logger_generator.info(f"Submitted the {data_type} data from request")
 
     # Alternative if statement somehow breaks the code, hence the try/except
     try:
         progression = construct_progression(performance)  # type: ignore PerformanceResponse
-        logger_generator.info(f"Parsed a progression from {perf_name}")
     except AttributeError:
-        logger_generator.info(
-            f"Can't parse a progression from {perf_name}: requesting a new one"
-        )
         req_prog = get_req_progression_generation(performance)
         progression_raw = await post_single_request(*req_prog, session=local_session)
         progression = ProgressionFields.parse_raw(progression_raw)
@@ -67,7 +60,6 @@ async def generate_progression(full_request: PerformanceRequest) -> PerformanceR
     req_midihex = get_req_midihex_generation(voices)
     midihex_raw = await post_single_request(*req_midihex, session=local_session)
     midihex = json.loads(midihex_raw)
-    logger_generator.info(f"Requested a new hex-encoded midi.")
 
     outcoming_performance = construct_performance(
         progression=progression,
@@ -75,15 +67,12 @@ async def generate_progression(full_request: PerformanceRequest) -> PerformanceR
         hex_blob=midihex,
         pseudo_midi=voices,
     )
-    logger_generator.info(f"Constructed a new performance.")
 
     try:
         await asyncio.gather(*task_chest)
     except ClientResponseError as e:  # pragma: no cover (no way to test remotely)
-        logger_generator.warning(f"Request failed: {e.status} {e.message}")
         raise
     await local_session.close()
-    logger_generator.info(f"Received all responses from the server.")
     del task_chest
     return outcoming_performance
 
@@ -126,11 +115,9 @@ async def amend_progression(
     try:
         await asyncio.gather(*task_chest)
     except ClientResponseError as e:  # pragma: no cover (no way to test remotely)
-        logger_generator.warning(f"Request failed: {e.status} {e.message}")
         raise
     await local_session.close()
     del task_chest
-    logger_generator.info(f"Received all responses from the server.")
     return outcoming_performance
 
 
