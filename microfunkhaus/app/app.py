@@ -53,6 +53,12 @@ def generate_app_with_config(
         dependencies=[Depends(check_token)],
     )
 
+    generation_description = """You can specify the optional key and mode (graph) parameters,
+    or even supply the otherwise verbatim progression with a changed key to transpose it."""
+    
+    amendment_description = """It is crucially important to provide a valid performance object,
+    copied verbatim from the response of the '/generate' endpoint."""
+
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["*"],
@@ -103,8 +109,6 @@ def generate_app_with_config(
     else:
         pass
 
-    generation_description = """You can specify the optional key and mode (graph) parameters,
-    or even supply the otherwise verbatim progression with a changed key to transpose it."""
 
     @app.post(
         "/generate",
@@ -127,8 +131,6 @@ def generate_app_with_config(
             raise HTTPException(status_code=e.status, detail=e.message)
         return responses
 
-    amendment_description = """It is crucially important to provide a valid performance object,
-    copied verbatim from the response of the '/generate' endpoint."""
 
     @app.post(
         "/amend/{index}",
