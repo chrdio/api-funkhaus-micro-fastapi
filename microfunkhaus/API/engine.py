@@ -8,7 +8,12 @@ from .endpoints import Endpoint
 
 async def post_single_request(
     endpoint: Endpoint, payload: BaseModel, *, session: ClientSession
-):
+    ) -> str:
+    """Makes a single POST request according
+    to the specified endpoint object
+    and the pydantic-object payload.
+    """
+
     serializable = jsonable_encoder(payload)
     async with session.post(
         str(endpoint), json=serializable, raise_for_status=True
@@ -17,6 +22,8 @@ async def post_single_request(
 
 
 async def ping_dependency(endpoint: Endpoint, *, session: ClientSession) -> bool:
+    """Returns True if endpoint responds OK (<400), else False"""
+
     async with session.get(str(endpoint), raise_for_status=True) as response:
         return response.ok
 
@@ -31,5 +38,8 @@ async def ping_dependency(endpoint: Endpoint, *, session: ClientSession) -> bool
 
 
 def instant_fire_coroutines(*coroutines) -> Tuple[asyncio.Task]:
+    """Starts execution of coroutines immidiately.
+    Returns a tuple of awaitable tasks.
+    """
 
     return tuple(asyncio.create_task(coro) for coro in coroutines)

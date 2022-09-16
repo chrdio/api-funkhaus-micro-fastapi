@@ -1,3 +1,5 @@
+"""Client-facing API-objects definitions with examples."""
+
 from ipaddress import IPv4Address
 from datetime import datetime
 from typing import Optional, Sequence, Tuple, Union
@@ -22,6 +24,7 @@ from chrdiotypes.musical import NodeFields
 
 
 class User(GenericUser):
+    """Extends parent class with validation and examples."""
     class Config:
         json_encoders = enum_encoders
         title = "Generic User Object"
@@ -48,6 +51,7 @@ class User(GenericUser):
 
 
 class Performance(BaseModel):
+    """Options for performance generation."""
     class Config:
         json_encoders = enum_encoders
         allow_extra = Extra.forbid
@@ -69,6 +73,7 @@ class Performance(BaseModel):
 
 
 class PerformanceResponse(BaseModel):
+    """Object that describes a particular performance of a chord progression."""
     class Config:
         json_encoders = enum_encoders
         title = "Progression/Performance Response Object"
@@ -200,6 +205,7 @@ class PerformanceResponse(BaseModel):
 
 
 class GenericRequest(BaseModel):
+    """Basic options provider"""
 
     sess_id: IPv4Address
     user_object: Optional[User] = None
@@ -221,6 +227,8 @@ class GenericRequest(BaseModel):
 
 
 class LabelingRequest(GenericRequest):
+    """Extends the GenericRequest with the performance labeling data."""
+
     class Config:
         json_encoders = enum_encoders
         schema_extra = {
@@ -243,7 +251,7 @@ class LabelingRequest(GenericRequest):
 
 
 class PerformanceRequest(GenericRequest):
-    """A data model with adapters."""
+    """Extends the GenericRequest with a performance or performance options object"""
 
     class Config:
         json_encoders = enum_encoders
@@ -263,6 +271,8 @@ class PerformanceRequest(GenericRequest):
 
 
 class AmendmentRequest(PerformanceRequest):
+    """Extends the GenericRequest with a performance object"""
+    
     class Config:
         json_encoders = enum_encoders
         schema_extra = {

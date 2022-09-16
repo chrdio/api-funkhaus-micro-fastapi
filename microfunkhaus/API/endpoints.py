@@ -1,9 +1,13 @@
+"""Deserializes json-file into a registry of valid endpoint objects."""
+
 import json
 from typing import Optional
 from pydantic import BaseModel
 
 
 class Endpoint(BaseModel):
+    """A model to deserialize the configuration of remote endpoints."""
+
     name: str
     host: str
     port: str
